@@ -7,65 +7,47 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.NeoMotorSubsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.Falcon500MotorSubsystem;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
  * An example command that uses an example subsystem.
  */
-public class RunNeoMotorAtVelocity extends CommandBase {
+public class RunFalcon500MotorUsingXboxController extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final NeoMotorSubsystem neoMotorSubsystem;
-  private String dashboardKey;
-  private double velocity;
+  private final Falcon500MotorSubsystem subsystem;
+  private final XboxController xboxController;
 
-  public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem) {
-    neoMotorSubsystem = subsystem;
-
+  /**
+   * Creates a new ExampleCommand.
+   *
+   * @param subsystem The subsystem used by this command.
+   */
+  public RunFalcon500MotorUsingXboxController(Falcon500MotorSubsystem subsystem, XboxController controller) {
+    this.subsystem = subsystem;
+    xboxController = controller;
+    
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
-  }
-
-
-  /**
-   * Creates a new ExampleCommand.
-   *
-   */
-  public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem, String dashboardKey) {
-    this(subsystem);
-
-    this.dashboardKey = dashboardKey;
-  }
-
-  /**
-   * Creates a new ExampleCommand.
-   *
-   */
-  public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem, double value) {
-    this(subsystem);
-
-    this.velocity = value;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (dashboardKey != null) {
-      velocity = SmartDashboard.getNumber(dashboardKey, 0);
-    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    neoMotorSubsystem.setVelocity(velocity);
+    subsystem.setSpeed(xboxController.getY(Hand.kLeft));
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    neoMotorSubsystem.stop();
+    subsystem.stop();
   }
 
   // Returns true when the command should end.

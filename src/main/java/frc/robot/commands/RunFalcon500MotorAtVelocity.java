@@ -7,21 +7,21 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.NeoMotorSubsystem;
+import frc.robot.subsystems.Falcon500MotorSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
  * An example command that uses an example subsystem.
  */
-public class RunNeoMotorAtVelocity extends CommandBase {
+public class RunFalcon500MotorAtVelocity extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final NeoMotorSubsystem neoMotorSubsystem;
+  private final Falcon500MotorSubsystem subsystem;
   private String dashboardKey;
   private double velocity;
 
-  public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem) {
-    neoMotorSubsystem = subsystem;
+  public RunFalcon500MotorAtVelocity(Falcon500MotorSubsystem subsystem) {
+    this.subsystem = subsystem;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
@@ -32,7 +32,7 @@ public class RunNeoMotorAtVelocity extends CommandBase {
    * Creates a new ExampleCommand.
    *
    */
-  public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem, String dashboardKey) {
+  public RunFalcon500MotorAtVelocity(Falcon500MotorSubsystem subsystem, String dashboardKey) {
     this(subsystem);
 
     this.dashboardKey = dashboardKey;
@@ -42,7 +42,7 @@ public class RunNeoMotorAtVelocity extends CommandBase {
    * Creates a new ExampleCommand.
    *
    */
-  public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem, double value) {
+  public RunFalcon500MotorAtVelocity(Falcon500MotorSubsystem subsystem, double value) {
     this(subsystem);
 
     this.velocity = value;
@@ -59,13 +59,13 @@ public class RunNeoMotorAtVelocity extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    neoMotorSubsystem.setVelocity(velocity);
+    subsystem.setVelocity(velocity);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    neoMotorSubsystem.stop();
+    subsystem.stop();
   }
 
   // Returns true when the command should end.

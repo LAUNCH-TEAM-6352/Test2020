@@ -13,8 +13,11 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.RunFalcon500MotorAtVelocity;
+import frc.robot.commands.RunFalcon500MotorUsingXboxController;
 import frc.robot.commands.RunNeoMotorAtVelocity;
 import frc.robot.commands.RunNeoMotorUsingXboxController;
+import frc.robot.subsystems.Falcon500MotorSubsystem;
 import frc.robot.subsystems.NeoMotorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -28,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final NeoMotorSubsystem neoMotorSubsystem = new NeoMotorSubsystem();
+  private final Falcon500MotorSubsystem falcon500MotorSubsystem = new Falcon500MotorSubsystem();
 
   XboxController xboxController = new XboxController(OIConstants.xboxControllerPort);
 
@@ -40,6 +44,7 @@ public class RobotContainer {
 
     // Configure default commands:
     neoMotorSubsystem.setDefaultCommand(new RunNeoMotorUsingXboxController(neoMotorSubsystem, xboxController));
+    falcon500MotorSubsystem.setDefaultCommand(new RunFalcon500MotorUsingXboxController(falcon500MotorSubsystem, xboxController));
 
     // Initialize smart dashboard:
     initSmartDashboard();
@@ -52,8 +57,11 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(xboxController, Button.kA.value)
+    new JoystickButton(xboxController, Button.kB.value)
       .whileHeld(new RunNeoMotorAtVelocity(neoMotorSubsystem, DashboardConstants.motorVeolcityKey));
+
+    new JoystickButton(xboxController, Button.kX.value)
+      .whileHeld(new RunFalcon500MotorAtVelocity(falcon500MotorSubsystem, DashboardConstants.motorVeolcityKey));
   }
   
   private void initSmartDashboard() {

@@ -7,29 +7,22 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANPIDController;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorConstants;
 
-public class NeoMotorSubsystem extends SubsystemBase {
-  private CANSparkMax motor = new CANSparkMax(MotorConstants.neoMotorChannel, MotorType.kBrushless);
-  private CANPIDController pidController;
+public class Falcon500MotorSubsystem extends SubsystemBase {
+  private TalonFX motor = new TalonFX(MotorConstants.falcon500MotorChannel);
 
   /**
    * Creates a new ExampleSubsystem.
    */
-  public NeoMotorSubsystem() {
-    pidController = motor.getPIDController();
-    pidController.setP(MotorConstants.neoMotorPidP);
-    pidController.setI(MotorConstants.neoMotorPidI);
-    pidController.setD(MotorConstants.neoMotorPidD);
-    pidController.setIZone(MotorConstants.neoMotorPidIZ);
-    pidController.setFF(MotorConstants.neoMotorPidFF);
-    pidController.setOutputRange(MotorConstants.neoMotorPidMinOutput, MotorConstants.neoMotorPidMaxOutput);
+  public Falcon500MotorSubsystem() {
+    motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    motor.selectProfileSlot(MotorConstants.falcon500MotorProfileSlot, MotorConstants.falcon500MotorPrimaryClosedLoop);
   }
 
   /**
@@ -37,7 +30,9 @@ public class NeoMotorSubsystem extends SubsystemBase {
    * @param velocity
    */
   public void setVelocity(double velocity) {
-    pidController.setReference(velocity, ControlType.kVelocity);
+    // Encoder measures 2048 units per rev. Velocity is measured in units per 100 ms.
+    var unitsPer100Ms = velocity * MotorConstants.falcon500MotorCountsPerRevolution / 600;
+    motor.set(ControlMode.Velocity, unitsPer100Ms);
   }
 
   /**
@@ -45,14 +40,13 @@ public class NeoMotorSubsystem extends SubsystemBase {
    * @param speed
    */
   public void setSpeed(double speed) {
-    motor.set(speed);
+    motor.set(ControlMode.PercentOutput, speed);
   }
 
   /**
    * Stop the motor.
    */
   public void stop() {
-    motor.stopMotor();
   }
 
   @Override

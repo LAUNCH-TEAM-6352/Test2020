@@ -26,6 +26,11 @@ public final class Constants {
         public static final double neoMotorPidFF = 0.0;
         public static final double neoMotorPidMinOutput = -1.0;
         public static final double neoMotorPidMaxOutput = 1.0;
+
+        public static final int falcon500MotorChannel = 2;
+        public static final int falcon500MotorProfileSlot = 0;
+        public static final int falcon500MotorCountsPerRevolution = 2048;
+        public static final int falcon500MotorPrimaryClosedLoop = 0;
     }
     
     public static final class OIConstants {
