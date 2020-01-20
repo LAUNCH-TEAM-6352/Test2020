@@ -13,50 +13,58 @@ import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.MotorConstants;
+import frc.robot.Constants.NeoMotorConstants;
 
-public class NeoMotorSubsystem extends SubsystemBase {
-  private CANSparkMax motor = new CANSparkMax(MotorConstants.neoMotorChannel, MotorType.kBrushless);
-  private CANPIDController pidController;
+public class NeoMotorSubsystem extends SubsystemBase
+{
+	private CANSparkMax motor = new CANSparkMax(NeoMotorConstants.channel, MotorType.kBrushless);
+	private CANPIDController pidController;
 
-  /**
-   * Creates a new ExampleSubsystem.
-   */
-  public NeoMotorSubsystem() {
-    pidController = motor.getPIDController();
-    pidController.setP(MotorConstants.neoMotorPidP);
-    pidController.setI(MotorConstants.neoMotorPidI);
-    pidController.setD(MotorConstants.neoMotorPidD);
-    pidController.setIZone(MotorConstants.neoMotorPidIZ);
-    pidController.setFF(MotorConstants.neoMotorPidFF);
-    pidController.setOutputRange(MotorConstants.neoMotorPidMinOutput, MotorConstants.neoMotorPidMaxOutput);
-  }
+	/**
+	 * Creates a new ExampleSubsystem.
+	 */
+	public NeoMotorSubsystem()
+	{
+		pidController = motor.getPIDController();
+		pidController.setP(NeoMotorConstants.pidP);
+		pidController.setI(NeoMotorConstants.pidI);
+		pidController.setD(NeoMotorConstants.pidD);
+		pidController.setIZone(NeoMotorConstants.pidIZ);
+		pidController.setFF(NeoMotorConstants.pidFF);
+		pidController.setOutputRange(NeoMotorConstants.pidMinOutput, NeoMotorConstants.pidMaxOutput);
+	}
 
-  /**
-   * Run motor at specified velocity in RPM.
-   * @param velocity
-   */
-  public void setVelocity(double velocity) {
-    pidController.setReference(velocity, ControlType.kVelocity);
-  }
+	/**
+	 * Run motor at specified velocity in RPM.
+	 * 
+	 * @param velocity
+	 */
+	public void setVelocity(double velocity)
+	{
+		pidController.setReference(velocity, ControlType.kVelocity);
+	}
 
-  /**
-   * Run motor at specified speed.
-   * @param speed
-   */
-  public void setSpeed(double speed) {
-    motor.set(speed);
-  }
+	/**
+	 * Run motor at specified power percentage.
+	 * 
+	 * @param percentage
+	 */
+	public void setPercentage(double percentage)
+	{
+		motor.set(percentage);
+	}
 
-  /**
-   * Stop the motor.
-   */
-  public void stop() {
-    motor.stopMotor();
-  }
+	/**
+	 * Stop the motor.
+	 */
+	public void stop()
+	{
+		motor.stopMotor();
+	}
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+	@Override
+	public void periodic()
+	{
+		// This method will be called once per scheduler run
+	}
 }

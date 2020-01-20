@@ -7,7 +7,7 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.Falcon500MotorSubsystem;
+import frc.robot.subsystems.RedlineMotorSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -15,11 +15,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /**
  * An example command that uses an example subsystem.
  */
-public class RunFalcon500MotorUsingXboxController extends CommandBase
+public class RunRedlineMotorUsingXboxController extends CommandBase
 {
 	@SuppressWarnings(
 	{ "PMD.UnusedPrivateField", "PMD.SingularField" })
-	private final Falcon500MotorSubsystem subsystem;
+	private final RedlineMotorSubsystem subsystem;
 	private final XboxController xboxController;
 
 	/**
@@ -28,7 +28,7 @@ public class RunFalcon500MotorUsingXboxController extends CommandBase
 	 * @param subsystem
 	 *                      The subsystem used by this command.
 	 */
-	public RunFalcon500MotorUsingXboxController(Falcon500MotorSubsystem subsystem, XboxController controller)
+	public RunRedlineMotorUsingXboxController(RedlineMotorSubsystem subsystem, XboxController controller)
 	{
 		this.subsystem = subsystem;
 		xboxController = controller;
@@ -50,7 +50,7 @@ public class RunFalcon500MotorUsingXboxController extends CommandBase
 	@Override
 	public void execute()
 	{
-		subsystem.setPercentage(xboxController.getY(Hand.kLeft));
+		subsystem.setPercentage(xboxController.getTriggerAxis(Hand.kRight) - xboxController.getTriggerAxis(Hand.kLeft));
 	}
 
 	// Called once the command ends or is interrupted.

@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
  */
 public class RunNeoMotorUsingXboxController extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final NeoMotorSubsystem neoMotorSubsystem;
+  private final NeoMotorSubsystem subsystem;
   private final XboxController xboxController;
 
   /**
@@ -26,11 +26,13 @@ public class RunNeoMotorUsingXboxController extends CommandBase {
    * @param subsystem The subsystem used by this command.
    */
   public RunNeoMotorUsingXboxController(NeoMotorSubsystem subsystem, XboxController controller) {
-    neoMotorSubsystem = subsystem;
+    this.subsystem = subsystem;
     xboxController = controller;
     
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+    if (subsystem != null) {
+      addRequirements(subsystem);
+    }
   }
 
   // Called when the command is initially scheduled.
@@ -41,13 +43,13 @@ public class RunNeoMotorUsingXboxController extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    neoMotorSubsystem.setSpeed(xboxController.getY(Hand.kRight));
+    subsystem.setPercentage(xboxController.getY(Hand.kRight));
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    neoMotorSubsystem.stop();
+    subsystem.stop();
   }
 
   // Returns true when the command should end.

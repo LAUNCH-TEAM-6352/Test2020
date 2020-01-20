@@ -14,63 +14,75 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /**
  * An example command that uses an example subsystem.
  */
-public class RunNeoMotorAtVelocity extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final NeoMotorSubsystem neoMotorSubsystem;
-  private String dashboardKey;
-  private double velocity;
+public class RunNeoMotorAtVelocity extends CommandBase
+{
+	@SuppressWarnings(
+	{ "PMD.UnusedPrivateField", "PMD.SingularField" })
+	private final NeoMotorSubsystem subsystem;
+	private String dashboardKey;
+	private double velocity;
 
-  public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem) {
-    neoMotorSubsystem = subsystem;
+	public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem)
+	{
+		this.subsystem = subsystem;
 
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
-  }
+		// Use addRequirements() here to declare subsystem dependencies.
+		if (subsystem != null)
+		{
+			addRequirements(subsystem);
+		}
+	}
 
+	/**
+	 * Creates a new ExampleCommand.
+	 *
+	 */
+	public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem, String dashboardKey)
+	{
+		this(subsystem);
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   */
-  public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem, String dashboardKey) {
-    this(subsystem);
+		this.dashboardKey = dashboardKey;
+	}
 
-    this.dashboardKey = dashboardKey;
-  }
+	/**
+	 * Creates a new ExampleCommand.
+	 *
+	 */
+	public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem, double value)
+	{
+		this(subsystem);
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   */
-  public RunNeoMotorAtVelocity(NeoMotorSubsystem subsystem, double value) {
-    this(subsystem);
+		this.velocity = value;
+	}
 
-    this.velocity = value;
-  }
+	// Called when the command is initially scheduled.
+	@Override
+	public void initialize()
+	{
+		if (dashboardKey != null)
+		{
+			velocity = SmartDashboard.getNumber(dashboardKey, 0);
+		}
+	}
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    if (dashboardKey != null) {
-      velocity = SmartDashboard.getNumber(dashboardKey, 0);
-    }
-  }
+	// Called every time the scheduler runs while the command is scheduled.
+	@Override
+	public void execute()
+	{
+		subsystem.setVelocity(velocity);
+	}
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    neoMotorSubsystem.setVelocity(velocity);
-  }
+	// Called once the command ends or is interrupted.
+	@Override
+	public void end(boolean interrupted)
+	{
+		subsystem.stop();
+	}
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    neoMotorSubsystem.stop();
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+	// Returns true when the command should end.
+	@Override
+	public boolean isFinished()
+	{
+		return false;
+	}
 }

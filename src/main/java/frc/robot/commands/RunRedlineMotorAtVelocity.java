@@ -7,31 +7,24 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.Falcon500MotorSubsystem;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
+import frc.robot.subsystems.RedlineMotorSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
  * An example command that uses an example subsystem.
  */
-public class RunFalcon500MotorUsingXboxController extends CommandBase
+public class RunRedlineMotorAtVelocity extends CommandBase
 {
 	@SuppressWarnings(
 	{ "PMD.UnusedPrivateField", "PMD.SingularField" })
-	private final Falcon500MotorSubsystem subsystem;
-	private final XboxController xboxController;
+	private final RedlineMotorSubsystem subsystem;
+	private String dashboardKey;
+	private double velocity;
 
-	/**
-	 * Creates a new ExampleCommand.
-	 *
-	 * @param subsystem
-	 *                      The subsystem used by this command.
-	 */
-	public RunFalcon500MotorUsingXboxController(Falcon500MotorSubsystem subsystem, XboxController controller)
+	public RunRedlineMotorAtVelocity(RedlineMotorSubsystem subsystem)
 	{
 		this.subsystem = subsystem;
-		xboxController = controller;
 
 		// Use addRequirements() here to declare subsystem dependencies.
 		if (subsystem != null)
@@ -40,17 +33,43 @@ public class RunFalcon500MotorUsingXboxController extends CommandBase
 		}
 	}
 
+	/**
+	 * Creates a new ExampleCommand.
+	 *
+	 */
+	public RunRedlineMotorAtVelocity(RedlineMotorSubsystem subsystem, String dashboardKey)
+	{
+		this(subsystem);
+
+		this.dashboardKey = dashboardKey;
+	}
+
+	/**
+	 * Creates a new ExampleCommand.
+	 *
+	 */
+	public RunRedlineMotorAtVelocity(RedlineMotorSubsystem subsystem, double value)
+	{
+		this(subsystem);
+
+		this.velocity = value;
+	}
+
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize()
 	{
+		if (dashboardKey != null)
+		{
+			velocity = SmartDashboard.getNumber(dashboardKey, 0);
+		}
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute()
 	{
-		subsystem.setPercentage(xboxController.getY(Hand.kLeft));
+		subsystem.setVelocity(velocity);
 	}
 
 	// Called once the command ends or is interrupted.
