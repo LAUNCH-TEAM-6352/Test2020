@@ -7,14 +7,17 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.RedlineMotorConstants;
 
-public class RedlineMotorSubsystem extends SubsystemBase
+public class RedlineMotorSubsystem extends MotorSubsystemBase
 {
 	private TalonSRX motor = new TalonSRX(RedlineMotorConstants.channel);
 
@@ -48,10 +51,12 @@ public class RedlineMotorSubsystem extends SubsystemBase
 	 * 
 	 * @param velocity
 	 */
+	@Override
 	public void setVelocity(double velocity)
 	{
 		// Velocity is measured in encoder counts per 100 ms.
 		var unitsPer100Ms = velocity * RedlineMotorConstants.countsPerRevolution / 600;
+		SmartDashboard.putNumber(DashboardConstants.setVelocityKey, unitsPer100Ms);
 		motor.set(ControlMode.Velocity, unitsPer100Ms);
 	}
 
@@ -60,6 +65,7 @@ public class RedlineMotorSubsystem extends SubsystemBase
 	 * 
 	 * @param percentage
 	 */
+	@Override
 	public void setPercentage(double percentage)
 	{
 		motor.set(ControlMode.PercentOutput, percentage);
@@ -68,8 +74,10 @@ public class RedlineMotorSubsystem extends SubsystemBase
 	/**
 	 * Stop the motor.
 	 */
+	@Override
 	public void stop()
 	{
+		setPercentage(0);
 	}
 
 	@Override

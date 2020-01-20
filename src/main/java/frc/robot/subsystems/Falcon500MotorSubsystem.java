@@ -7,14 +7,17 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.Falcon500MotorConstants;
 
-public class Falcon500MotorSubsystem extends SubsystemBase
+public class Falcon500MotorSubsystem extends MotorSubsystemBase
 {
 	private TalonFX motor = new TalonFX(Falcon500MotorConstants.channel);
 
@@ -48,11 +51,13 @@ public class Falcon500MotorSubsystem extends SubsystemBase
 	 * 
 	 * @param velocity
 	 */
+	@Override
 	public void setVelocity(double velocity)
 	{
 		// Encoder measures 2048 units per rev. Velocity is measured in units per 100
 		// ms.
 		var unitsPer100Ms = velocity * Falcon500MotorConstants.countsPerRevolution / 600;
+		SmartDashboard.putNumber(DashboardConstants.setVelocityKey, unitsPer100Ms);
 		motor.set(ControlMode.Velocity, unitsPer100Ms);
 	}
 
@@ -61,6 +66,7 @@ public class Falcon500MotorSubsystem extends SubsystemBase
 	 * 
 	 * @param percentage
 	 */
+	@Override
 	public void setPercentage(double percentage)
 	{
 		motor.set(ControlMode.PercentOutput, percentage);
@@ -69,8 +75,10 @@ public class Falcon500MotorSubsystem extends SubsystemBase
 	/**
 	 * Stop the motor.
 	 */
+	@Override
 	public void stop()
 	{
+		setPercentage(0);
 	}
 
 	@Override

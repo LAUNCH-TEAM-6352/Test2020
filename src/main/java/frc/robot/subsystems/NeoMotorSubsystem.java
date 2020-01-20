@@ -7,15 +7,18 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.NeoMotorConstants;
 
-public class NeoMotorSubsystem extends SubsystemBase
+public class NeoMotorSubsystem extends MotorSubsystemBase
 {
 	private CANSparkMax motor = new CANSparkMax(NeoMotorConstants.channel, MotorType.kBrushless);
 	private CANPIDController pidController;
@@ -39,8 +42,10 @@ public class NeoMotorSubsystem extends SubsystemBase
 	 * 
 	 * @param velocity
 	 */
+	@Override
 	public void setVelocity(double velocity)
 	{
+		SmartDashboard.putNumber(DashboardConstants.setVelocityKey, velocity);
 		pidController.setReference(velocity, ControlType.kVelocity);
 	}
 
@@ -49,6 +54,7 @@ public class NeoMotorSubsystem extends SubsystemBase
 	 * 
 	 * @param percentage
 	 */
+	@Override
 	public void setPercentage(double percentage)
 	{
 		motor.set(percentage);
@@ -57,6 +63,7 @@ public class NeoMotorSubsystem extends SubsystemBase
 	/**
 	 * Stop the motor.
 	 */
+	@Override
 	public void stop()
 	{
 		motor.stopMotor();

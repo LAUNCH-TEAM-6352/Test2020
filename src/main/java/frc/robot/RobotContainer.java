@@ -7,17 +7,19 @@
 
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.RunFalcon500MotorAtVelocity;
 import frc.robot.commands.RunFalcon500MotorUsingXboxController;
-import frc.robot.commands.RunNeoMotorAtVelocity;
+import frc.robot.commands.RunMotorAtPercentage;
+import frc.robot.commands.RunMotorAtVelocity;
 import frc.robot.commands.RunNeoMotorUsingXboxController;
-import frc.robot.commands.RunRedlineMotorAtVelocity;
 import frc.robot.commands.RunRedlineMotorUsingXboxController;
 import frc.robot.subsystems.Falcon500MotorSubsystem;
 import frc.robot.subsystems.NeoMotorSubsystem;
@@ -35,8 +37,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer
 {
 	// The robot's subsystems and commands are defined here...
-	private NeoMotorSubsystem neoMotorSubsystem = null;
-	private Falcon500MotorSubsystem falcon500MotorSubsystem = null;
+	private final NeoMotorSubsystem neoMotorSubsystem = null;
+	private final Falcon500MotorSubsystem falcon500MotorSubsystem = null;
 	private RedlineMotorSubsystem redlineMotorSubsystem = null;
 
 	XboxController xboxController = new XboxController(OIConstants.xboxControllerPort);
@@ -46,9 +48,6 @@ public class RobotContainer
 	 */
 	public RobotContainer()
 	{
-		// Configure the button bindings
-		configureButtonBindings();
-
 		// Create desired subsystems:
 		// neoMotorSubsystem = new NeoMotorSubsystem();
 		// falcon500MotorSubsystem = new Falcon500MotorSubsystem();
@@ -57,20 +56,26 @@ public class RobotContainer
 		// Configure default commands:
 		if (neoMotorSubsystem != null)
 		{
-			neoMotorSubsystem.setDefaultCommand(new RunNeoMotorUsingXboxController(neoMotorSubsystem, xboxController));
+			neoMotorSubsystem.setDefaultCommand(
+				new RunNeoMotorUsingXboxController(neoMotorSubsystem, xboxController));
 		}
 
 		if (falcon500MotorSubsystem != null)
 		{
 			falcon500MotorSubsystem.setDefaultCommand(
-					new RunFalcon500MotorUsingXboxController(falcon500MotorSubsystem, xboxController));
+				new RunFalcon500MotorUsingXboxController(falcon500MotorSubsystem, xboxController));
 		}
 
 		if (redlineMotorSubsystem != null)
 		{
-			redlineMotorSubsystem
-					.setDefaultCommand(new RunRedlineMotorUsingXboxController(redlineMotorSubsystem, xboxController));
+			redlineMotorSubsystem.setDefaultCommand(
+				new RunMotorAtPercentage(redlineMotorSubsystem, () ->
+					(xboxController.getTriggerAxis(Hand.kRight) - xboxController.getTriggerAxis(Hand.kLeft))
+			));
 		}
+
+		// Configure the button bindings
+		configureButtonBindings();
 
 		// Initialize smart dashboard:
 		initSmartDashboard();
@@ -85,18 +90,18 @@ public class RobotContainer
 	private void configureButtonBindings()
 	{
 		new JoystickButton(xboxController, Button.kB.value)
-				.whileHeld(new RunNeoMotorAtVelocity(neoMotorSubsystem, DashboardConstants.motorVeolcityKey));
+				.whileHeld(new RunMotorAtVelocity(neoMotorSubsystem, DashboardConstants.targetVelocityKey));
 
 		new JoystickButton(xboxController, Button.kX.value).whileHeld(
-				new RunFalcon500MotorAtVelocity(falcon500MotorSubsystem, DashboardConstants.motorVeolcityKey));
+				new RunMotorAtVelocity(falcon500MotorSubsystem, DashboardConstants.targetVelocityKey));
 
 		new JoystickButton(xboxController, Button.kY.value)
-				.whileHeld(new RunRedlineMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.motorVeolcityKey));
+				.whileHeld(new RunMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.targetVelocityKey));
 	}
 
 	private void initSmartDashboard()
 	{
-		SmartDashboard.setDefaultNumber(DashboardConstants.motorVeolcityKey, DashboardConstants.motorVeolcityDefault);
+		SmartDashboard.setDefaultNumber(DashboardConstants.targetVelocityKey, DashboardConstants.targetVelocityDefault);
 	}
 
 	/**
