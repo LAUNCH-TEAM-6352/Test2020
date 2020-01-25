@@ -7,8 +7,6 @@
 
 package frc.robot;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -16,15 +14,14 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.RunFalcon500MotorUsingXboxController;
 import frc.robot.commands.RunMotorAtPercentage;
 import frc.robot.commands.RunMotorAtVelocity;
-import frc.robot.commands.RunNeoMotorUsingXboxController;
-import frc.robot.commands.RunRedlineMotorUsingXboxController;
 import frc.robot.subsystems.Falcon500MotorSubsystem;
 import frc.robot.subsystems.NeoMotorSubsystem;
 import frc.robot.subsystems.RedlineMotorSubsystem;
+import frc.util.LimelightCamera;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -57,13 +54,13 @@ public class RobotContainer
 		if (neoMotorSubsystem != null)
 		{
 			neoMotorSubsystem.setDefaultCommand(
-				new RunNeoMotorUsingXboxController(neoMotorSubsystem, xboxController));
+				new RunMotorAtPercentage(neoMotorSubsystem, () -> xboxController.getY(Hand.kRight)));
 		}
 
 		if (falcon500MotorSubsystem != null)
 		{
 			falcon500MotorSubsystem.setDefaultCommand(
-				new RunFalcon500MotorUsingXboxController(falcon500MotorSubsystem, xboxController));
+				new RunMotorAtPercentage(falcon500MotorSubsystem, () -> xboxController.getY(Hand.kLeft)));
 		}
 
 		if (redlineMotorSubsystem != null)
@@ -102,6 +99,11 @@ public class RobotContainer
 	private void initSmartDashboard()
 	{
 		SmartDashboard.setDefaultNumber(DashboardConstants.targetVelocityKey, DashboardConstants.targetVelocityDefault);
+
+		SmartDashboard.putData("LL: Toggle LED", new InstantCommand(() -> LimelightCamera.getInstance().toggleLed()));
+		SmartDashboard.putData("LL: Toggle Mode", new InstantCommand(() -> LimelightCamera.getInstance().toggleVisionProcessingMode()));
+		SmartDashboard.putData("LL: Zoom In", new InstantCommand(() -> LimelightCamera.getInstance().zoomIn()));
+		SmartDashboard.putData("LL: Zoom Out", new InstantCommand(() -> LimelightCamera.getInstance().zoomOut()));
 	}
 
 	/**

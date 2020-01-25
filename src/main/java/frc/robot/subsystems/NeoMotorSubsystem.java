@@ -7,8 +7,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.function.DoubleSupplier;
-
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;

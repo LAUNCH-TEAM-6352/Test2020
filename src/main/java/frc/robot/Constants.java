@@ -85,4 +85,26 @@ public final class Constants
 		public static final double targetVelocityDefault = 1000;
 		public static final String setVelocityKey = "Set Veolcity";
 	}
+
+	public static final class LimelightConstants
+	{
+		public static final String tableName = "limelight";
+		public static final String pipelineEntryName = "pipeline";
+		public static final String xPositionEntryName = "tx";
+		public static final String yPositionEntryName = "ty";
+		public static final String targetAcquiredEntryName = "tv";
+		public static final String areaEntryName = "ta";
+		public static final String camModeEntryName = "camMode";
+		public static final String ledModeEntryName = "ledMode";
+
+		public static final int camModeVsionProcessing = 0;
+		public static final int camModeDriver = 1;
+
+		public static final int ledModePipeline = 0;
+		public static final int ledModeOff = 1;
+		public static final int ledModeOn = 3;
+
+		public static final int pipelineZoomedOut = 0;
+		public static final int pipelineZoomedIn = 1;
+	}
 }

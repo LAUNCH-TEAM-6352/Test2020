@@ -7,12 +7,10 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.Falcon500MotorSubsystem;
 import frc.robot.subsystems.MotorSubsystemBase;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
@@ -24,8 +22,6 @@ public class RunMotorAtPercentage extends CommandBase
 	{ "PMD.UnusedPrivateField", "PMD.SingularField" })
 	private final MotorSubsystemBase subsystem;
 	private final DoubleSupplier doubleSupplier;
-	private String dashboardKey;
-	private double velocity;
 
 	public RunMotorAtPercentage(MotorSubsystemBase subsystem, DoubleSupplier doubleSupplier)
 	{

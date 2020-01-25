@@ -7,7 +7,6 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.Falcon500MotorSubsystem;
 import frc.robot.subsystems.MotorSubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -70,14 +69,20 @@ public class RunMotorAtVelocity extends CommandBase
 	@Override
 	public void execute()
 	{
-		subsystem.setVelocity(velocity);
+		if (subsystem != null)
+		{
+			subsystem.setVelocity(velocity);
+		}
 	}
 
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted)
 	{
-		subsystem.stop();
+		if (subsystem != null)
+		{
+			subsystem.stop();
+		}
 	}
 
 	// Returns true when the command should end.
