@@ -104,6 +104,8 @@ public class RobotContainer
 		SmartDashboard.putData("LL: Toggle Mode", new InstantCommand(() -> LimelightCamera.getInstance().toggleVisionProcessingMode()));
 		SmartDashboard.putData("LL: Zoom In", new InstantCommand(() -> LimelightCamera.getInstance().zoomIn()));
 		SmartDashboard.putData("LL: Zoom Out", new InstantCommand(() -> LimelightCamera.getInstance().zoomOut()));
+
+		SmartDashboard.putData("Run Redline at Veolcity", new RunMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.targetVelocityKey));
 	}
 
 	/**

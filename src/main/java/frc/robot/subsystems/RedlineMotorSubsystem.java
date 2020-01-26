@@ -42,6 +42,8 @@ public class RedlineMotorSubsystem extends MotorSubsystemBase
 		motor.config_IntegralZone(RedlineMotorConstants.profileSlot, RedlineMotorConstants.pidIZ,
 				RedlineMotorConstants.pidTimeoutMs);
 		motor.selectProfileSlot(RedlineMotorConstants.profileSlot, RedlineMotorConstants.primaryClosedLoop);
+
+		motor.setSensorPhase(RedlineMotorConstants.phase);
 	}
 
 	/**
@@ -52,8 +54,10 @@ public class RedlineMotorSubsystem extends MotorSubsystemBase
 	@Override
 	public void setVelocity(double velocity)
 	{
-		// Velocity is measured in encoder counts per 100 ms.
-		var unitsPer100Ms = velocity * RedlineMotorConstants.countsPerRevolution / 600;
+		// Velocity is measured in encoder units per 100 ms.
+		var unitsPer100Ms =
+			velocity * RedlineMotorConstants.countsPerRevolution * RedlineMotorConstants.ticksPerCount
+			/ (60.0 * 1000.0 / 100.0);
 		SmartDashboard.putNumber(DashboardConstants.setVelocityKey, unitsPer100Ms);
 		motor.set(ControlMode.Velocity, unitsPer100Ms);
 	}
