@@ -14,11 +14,15 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.AimShooterUsingLimelight;
 import frc.robot.commands.RunMotorAtPercentage;
 import frc.robot.commands.RunMotorAtVelocity;
+import frc.robot.commands.RunShooterWithGameController;
 import frc.robot.subsystems.Falcon500MotorSubsystem;
 import frc.robot.subsystems.NeoMotorSubsystem;
 import frc.robot.subsystems.RedlineMotorSubsystem;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Vex775proMotorSubsystem;
 import frc.util.LimelightCamera;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -37,18 +41,30 @@ public class RobotContainer
 	private final NeoMotorSubsystem neoMotorSubsystem = null;
 	private final Falcon500MotorSubsystem falcon500MotorSubsystem = null;
 	private RedlineMotorSubsystem redlineMotorSubsystem = null;
+	private Vex775proMotorSubsystem vex775proMotorSubsystem = null;
 
-	XboxController xboxController = new XboxController(OIConstants.xboxControllerPort);
+	private Shooter shooter = null;
+
+	// I/O Devices:
+	private XboxController xboxController = null;
+	private LimelightCamera limelightCamera = null;
 
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
 	public RobotContainer()
 	{
+		// Create I/O Devices:
+		xboxController = new XboxController(OIConstants.xboxControllerPort);
+		limelightCamera = LimelightCamera.getInstance();
+
 		// Create desired subsystems:
 		// neoMotorSubsystem = new NeoMotorSubsystem();
 		// falcon500MotorSubsystem = new Falcon500MotorSubsystem();
-		redlineMotorSubsystem = new RedlineMotorSubsystem();
+		//redlineMotorSubsystem = new RedlineMotorSubsystem();
+		//vex775proMotorSubsystem = new Vex775proMotorSubsystem();
+
+		shooter = new Shooter(xboxController);
 
 		// Configure default commands:
 		if (neoMotorSubsystem != null)
@@ -71,6 +87,19 @@ public class RobotContainer
 			));
 		}
 
+		if (vex775proMotorSubsystem != null)
+		{
+			vex775proMotorSubsystem.setDefaultCommand(
+				new RunMotorAtPercentage(vex775proMotorSubsystem, () ->
+					(xboxController.getTriggerAxis(Hand.kRight) - xboxController.getTriggerAxis(Hand.kLeft))
+			));
+		}
+
+		if (shooter != null)
+		{
+			shooter.setDefaultCommand(new RunShooterWithGameController(shooter, xboxController));
+		}
+
 		// Configure the button bindings
 		configureButtonBindings();
 
@@ -87,25 +116,36 @@ public class RobotContainer
 	private void configureButtonBindings()
 	{
 		new JoystickButton(xboxController, Button.kB.value)
-				.whileHeld(new RunMotorAtVelocity(neoMotorSubsystem, DashboardConstants.targetVelocityKey));
+			.whileHeld(new RunMotorAtVelocity(neoMotorSubsystem, DashboardConstants.targetVelocityKey));
 
-		new JoystickButton(xboxController, Button.kX.value).whileHeld(
-				new RunMotorAtVelocity(falcon500MotorSubsystem, DashboardConstants.targetVelocityKey));
+		new JoystickButton(xboxController, Button.kX.value)
+			.whileHeld(new RunMotorAtVelocity(falcon500MotorSubsystem, DashboardConstants.targetVelocityKey));
 
 		new JoystickButton(xboxController, Button.kY.value)
-				.whileHeld(new RunMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.targetVelocityKey));
+			.whileHeld(new RunMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.targetVelocityKey));
+
+		new JoystickButton(xboxController, Button.kA.value)
+			.whenPressed(new AimShooterUsingLimelight(shooter));
 	}
 
 	private void initSmartDashboard()
 	{
-		SmartDashboard.setDefaultNumber(DashboardConstants.targetVelocityKey, DashboardConstants.targetVelocityDefault);
+		SmartDashboard.putNumber(DashboardConstants.targetVelocityKey, DashboardConstants.targetVelocityDefault);
+		SmartDashboard.putNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault);
 
-		SmartDashboard.putData("LL: Toggle LED", new InstantCommand(() -> LimelightCamera.getInstance().toggleLed()));
-		SmartDashboard.putData("LL: Toggle Mode", new InstantCommand(() -> LimelightCamera.getInstance().toggleVisionProcessingMode()));
-		SmartDashboard.putData("LL: Zoom In", new InstantCommand(() -> LimelightCamera.getInstance().zoomIn()));
-		SmartDashboard.putData("LL: Zoom Out", new InstantCommand(() -> LimelightCamera.getInstance().zoomOut()));
+		SmartDashboard.putData("LL: Toggle LED", new InstantCommand(() -> limelightCamera.toggleLed()));
+		SmartDashboard.putData("LL: Toggle Mode", new InstantCommand(() -> limelightCamera.toggleVisionProcessingMode()));
+		SmartDashboard.putData("LL: Zoom 1", new InstantCommand(() -> limelightCamera.setZoom(1)));
+		SmartDashboard.putData("LL: Zoom 2", new InstantCommand(() -> limelightCamera.setZoom(2)));
+		SmartDashboard.putData("LL: Zoom 3", new InstantCommand(() -> limelightCamera.setZoom(3)));
 
 		SmartDashboard.putData("Run Redline at Veolcity", new RunMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.targetVelocityKey));
+		SmartDashboard.putData("Run Redline at Percentage", new RunMotorAtPercentage(redlineMotorSubsystem, () -> SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, 0.0)));
+
+		SmartDashboard.putData("Run 775pro at Veolcity", new RunMotorAtVelocity(vex775proMotorSubsystem, DashboardConstants.targetVelocityKey));
+		SmartDashboard.putData("Run 775pro at Percentage", new RunMotorAtPercentage(vex775proMotorSubsystem, () -> SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, 0.0)));
+
+		SmartDashboard.putData("Target Shooter", new AimShooterUsingLimelight(shooter));
 	}
 
 	/**

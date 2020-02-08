@@ -8,30 +8,33 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.MotorSubsystemBase;
+import frc.robot.subsystems.Shooter;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
  * An example command that uses an example subsystem.
  */
-public class RunMotorAtPercentage extends CommandBase
+public class RunShooterWithGameController extends CommandBase
 {
 	@SuppressWarnings(
 	{ "PMD.UnusedPrivateField", "PMD.SingularField" })
-	private final MotorSubsystemBase subsystem;
-	private final DoubleSupplier doubleSupplier;
+	private final Shooter shooter;
+	private final XboxController controller;
 
-	public RunMotorAtPercentage(MotorSubsystemBase subsystem, DoubleSupplier doubleSupplier)
+	public RunShooterWithGameController(Shooter shooter, XboxController controller)
 	{
-		this.subsystem = subsystem;
-		this.doubleSupplier = doubleSupplier;
+		this.shooter = shooter;
+		this.controller = controller;
 
 		// Use addRequirements() here to declare subsystem dependencies.
-		if (subsystem != null)
+		if (shooter != null)
 		{
-			addRequirements(subsystem);
+			addRequirements(shooter);
 		}
 	}
 
@@ -45,9 +48,10 @@ public class RunMotorAtPercentage extends CommandBase
 	@Override
 	public void execute()
 	{
-		if (subsystem != null)
+		if (shooter != null)
 		{
-			subsystem.setPercentage(doubleSupplier.getAsDouble());
+			shooter.setAltitude(controller.getY(Hand.kRight) * -1.0);
+			shooter.setAzimuth(controller.getX(Hand.kRight));
 		}
 	}
 
@@ -55,7 +59,7 @@ public class RunMotorAtPercentage extends CommandBase
 	@Override
 	public void end(boolean interrupted)
 	{
-		subsystem.stop();
+		shooter.stopTurret();
 	}
 
 	// Returns true when the command should end.

@@ -17,23 +17,21 @@ import frc.robot.Constants.LimelightConstants;
  */
 public class LimelightCamera
 {
-	private static LimelightCamera instance;
-	private static final String tableName = "limelight";
+	private static LimelightCamera instance = null;
 
 	// The following are for accessing the network table entries used by the Limelight:
-	private NetworkTable limelightTable;
-	private NetworkTableEntry pipelineEntry;
-	private NetworkTableEntry xPositionEntry;
-	private NetworkTableEntry yPositionEntry;
-	private NetworkTableEntry areaEntry;
-	private NetworkTableEntry camModeEntry;
-	private NetworkTableEntry ledModeEntry;
-	private NetworkTableEntry targetAcquiredEntry;
+	private NetworkTable limelightTable = null;
+	private NetworkTableEntry pipelineEntry = null;
+	private NetworkTableEntry xPositionEntry = null;
+	private NetworkTableEntry yPositionEntry = null;
+	private NetworkTableEntry areaEntry = null;
+	private NetworkTableEntry camModeEntry = null;
+	private NetworkTableEntry ledModeEntry = null;
+	private NetworkTableEntry targetAcquiredEntry = null;
 	
 
 	public synchronized static LimelightCamera getInstance()
 	{
-		
 		if (instance == null)
 		{
 			instance = new LimelightCamera();
@@ -43,7 +41,7 @@ public class LimelightCamera
 	}
 
 	/**
-	 * Constructor i=s private as the only way to get an instance
+	 * Constructor is private as the only way to get an instance
 	 * is through the getInstance() static methoid.
 	 */
 	private LimelightCamera()
@@ -57,6 +55,8 @@ public class LimelightCamera
 		camModeEntry = limelightTable.getEntry(LimelightConstants.camModeEntryName);
 		ledModeEntry = limelightTable.getEntry(LimelightConstants.ledModeEntryName);
 		targetAcquiredEntry = limelightTable.getEntry(LimelightConstants.targetAcquiredEntryName);
+
+		setZoom(LimelightConstants.defaultZoom);
 	}
 
 	/**
@@ -158,34 +158,21 @@ public class LimelightCamera
 	}
 
 	/**
-	 * Set the camera in zoomed in state.
+	 * Sets the zoom level of the camera.
+	 * Rhw zoom level is used directly as the pipeline numer.
 	 */
-	public void zoomIn()
+	public void setZoom(int zoomLevel)
 	{
-		pipelineEntry.setDouble(LimelightConstants.pipelineZoomedIn);
-	}
-
-	/**
-	 * Set the camera in zoomed out state.
-	 */
-	public void zoomOut()
-	{
-		pipelineEntry.setDouble(LimelightConstants.pipelineZoomedOut);
-	}
-
-	/**
-	 * Toggles the zoom state.
-	 */
-	public void toggleZoom()
-	{
-		switch ((int) pipelineEntry.getDouble(0))
+		// Ensure zoom level is supported:
+		if (zoomLevel < LimelightConstants.minZoom)
 		{
-			case LimelightConstants.pipelineZoomedIn:
-				zoomOut();
-				break;
-
-			default:
-				zoomIn();
+			zoomLevel = LimelightConstants.minZoom;
 		}
+		else if (zoomLevel > LimelightConstants.maxZoom)
+		{
+			zoomLevel = LimelightConstants.maxZoom;
+		}
+
+		pipelineEntry.setDouble(zoomLevel);
 	}
 }
