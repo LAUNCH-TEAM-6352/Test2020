@@ -10,6 +10,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DashboardConstants;
+import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.TargetingConstants;
 import frc.robot.subsystems.Shooter;
 import frc.util.LimelightCamera;
@@ -21,13 +22,13 @@ public class AimShooterUsingLimelight extends CommandBase
 
 	private double altitudeSlope;
 	private double altitudeYIntercept;
-	private double altitudeMaxSpeed;
-	private double altitudeMinSpeed;
+	private double altitudeMaxSpeedAbs;
+	private double altitudeMinSpeedAbs;
 
 	private double azimuthSlope;
 	private double azimuthYIntercept;
-	private double azimuthMaxSpeed;
-	private double azimuthMinSpeed;
+	private double azimuthMaxSpeedAbs;
+	private double azimuthMinSpeedAbs;
 
 	/**
 	 * Creates a new AimShooterUsingLimelight.
@@ -43,20 +44,31 @@ public class AimShooterUsingLimelight extends CommandBase
 	@Override
 	public void initialize()
 	{
+		//Make sure limelight is in proper mode:
+		limelight.setPipeline(LimelightConstants.pipelineZoom2);
+
+		// If the Limelight hasn't acquired a target, there is nothing much we can do.
+		if (!limelight.isTargetAcquired())
+		{
+			return;
+		}
+
+		double sign = Math.signum(limelight.getTargetYPosition());
 		altitudeSlope =
-			(TargetingConstants.minAltitudeSpeed - TargetingConstants.maxAltitudeSpeed) /
-			(TargetingConstants.minAltitudeDelta - TargetingConstants.maxAltitudeDelta);
-		altitudeYIntercept = TargetingConstants.maxAltitudeSpeed - (altitudeSlope * TargetingConstants.maxAltitudeDelta);
-		altitudeMaxSpeed = TargetingConstants.maxAltitudeSpeed;
-		altitudeMinSpeed = TargetingConstants.minAltitudeSpeed;
+			(TargetingConstants.minAltitudeSpeed * sign - TargetingConstants.maxAltitudeSpeed * sign) /
+			(TargetingConstants.minAltitudeDelta * sign - TargetingConstants.maxAltitudeDelta * sign);
+		altitudeYIntercept = TargetingConstants.maxAltitudeSpeed * sign - (altitudeSlope * TargetingConstants.maxAltitudeDelta * sign);
+		altitudeMaxSpeedAbs = TargetingConstants.maxAltitudeSpeed;
+		altitudeMinSpeedAbs = TargetingConstants.minAltitudeSpeed;
 
+		sign = Math.signum(limelight.getTargetXPosition());
 		azimuthSlope =
-			(TargetingConstants.minAzimuthSpeed - TargetingConstants.maxAzimuthSpeed) /
-			(TargetingConstants.minAzimuthDelta - TargetingConstants.maxAzimuthDelta);
+			(TargetingConstants.minAzimuthSpeed * sign - TargetingConstants.maxAzimuthSpeed * sign) /
+			(TargetingConstants.minAzimuthDelta * sign - TargetingConstants.maxAzimuthDelta * sign);
 
-		azimuthYIntercept = TargetingConstants.maxAzimuthSpeed - (azimuthSlope * TargetingConstants.maxAzimuthDelta);
-		azimuthMaxSpeed = TargetingConstants.maxAzimuthSpeed;
-		azimuthMinSpeed = TargetingConstants.minAzimuthSpeed;
+		azimuthYIntercept = TargetingConstants.maxAzimuthSpeed * sign - (azimuthSlope * TargetingConstants.maxAzimuthDelta * sign);
+		azimuthMaxSpeedAbs = TargetingConstants.maxAzimuthSpeed;
+		azimuthMinSpeedAbs = TargetingConstants.minAzimuthSpeed;
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
@@ -92,11 +104,11 @@ public class AimShooterUsingLimelight extends CommandBase
 		double output = input * altitudeSlope + altitudeYIntercept;
 		double sign = Math.signum(output);
 
-		if (Math.abs(output) > altitudeMaxSpeed)
+		if (Math.abs(output) > altitudeMaxSpeedAbs)
 		{
-			output = altitudeMaxSpeed * sign;
+			output = altitudeMaxSpeedAbs * sign;
 		}
-		else if (Math.abs(output) < altitudeMinSpeed)
+		else if (Math.abs(output) < altitudeMinSpeedAbs)
 		{
 			output = 0;
 		}
@@ -109,11 +121,11 @@ public class AimShooterUsingLimelight extends CommandBase
 		double output = input * azimuthSlope + azimuthYIntercept;
 		double sign = Math.signum(output);
 
-		if (Math.abs(output) > azimuthMaxSpeed)
+		if (Math.abs(output) > azimuthMaxSpeedAbs)
 		{
-			output = azimuthMaxSpeed * sign;
+			output = azimuthMaxSpeedAbs * sign;
 		}
-		else if (Math.abs(output) < azimuthMinSpeed)
+		else if (Math.abs(output) < azimuthMinSpeedAbs)
 		{
 			output = 0;
 		}

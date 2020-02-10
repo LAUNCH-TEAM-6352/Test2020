@@ -10,6 +10,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.LimelightConstants;
+import frc.util.LimelightCamera;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -79,6 +81,9 @@ public class Robot extends TimedRobot
 	@Override
 	public void autonomousInit()
 	{
+		// Activate proper Limelight pipeline for automomous:
+		LimelightCamera.getInstance().setPipeline(LimelightConstants.pipelineZoom2);
+
 		m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
 		// schedule the autonomous command (example)
@@ -99,6 +104,9 @@ public class Robot extends TimedRobot
 	@Override
 	public void teleopInit()
 	{
+		// Assume drivers will want to use Limelight camera for driving:
+		LimelightCamera.getInstance().setPipeline(LimelightConstants.pipelineDriver);
+
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove

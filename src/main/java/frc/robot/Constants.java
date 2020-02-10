@@ -138,16 +138,15 @@ public final class Constants
 		public static final String camModeEntryName = "camMode";
 		public static final String ledModeEntryName = "ledMode";
 
-		public static final int camModeVsionProcessing = 0;
-		public static final int camModeDriver = 1;
-
 		public static final int ledModePipeline = 0;
 		public static final int ledModeOff = 1;
 		public static final int ledModeOn = 3;
 
-		public static final int defaultZoom = 1;
-		public static final int minZoom = 1;
-		public static final int maxZoom = 3;
+		public static final int pipelineDriver = 0;
+		public static final int pipelineZoom1 = 1;
+		public static final int pipelineZoom2 = 2;
+		public static final int pipelineZoom3 = 3;
+		public static final int pipelineDefault = pipelineDriver;
 	}
 
 	public static final class ShooterConstants
@@ -168,13 +167,13 @@ public final class Constants
 		public static final double maxAzimuthSpeed = 1.0;
 		public static final double minAzimuthSpeed = 0.1;
 		public static final double maxAzimuthDelta = 30.0;
-		public static final double minAzimuthDelta = 1.0;
-		public static final double azimuthTolerance = 1.0;
+		public static final double minAzimuthDelta = 0.5;
+		public static final double azimuthTolerance = 0.5;
 
 		public static final double maxAltitudeSpeed = 1.0;
 		public static final double minAltitudeSpeed = 0.3;
 		public static final double maxAltitudeDelta = 25.0;
-		public static final double minAltitudeDelta = 1.0;
-		public static final double altitudeTolerance = 1.0;
+		public static final double minAltitudeDelta = 0.5;
+		public static final double altitudeTolerance = 0.5;
 	}
 }

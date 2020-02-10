@@ -25,7 +25,6 @@ public class LimelightCamera
 	private NetworkTableEntry xPositionEntry = null;
 	private NetworkTableEntry yPositionEntry = null;
 	private NetworkTableEntry areaEntry = null;
-	private NetworkTableEntry camModeEntry = null;
 	private NetworkTableEntry ledModeEntry = null;
 	private NetworkTableEntry targetAcquiredEntry = null;
 	
@@ -52,11 +51,11 @@ public class LimelightCamera
 		xPositionEntry = limelightTable.getEntry(LimelightConstants.xPositionEntryName);
 		yPositionEntry = limelightTable.getEntry(LimelightConstants.yPositionEntryName);
 		areaEntry = limelightTable.getEntry(LimelightConstants.areaEntryName);
-		camModeEntry = limelightTable.getEntry(LimelightConstants.camModeEntryName);
 		ledModeEntry = limelightTable.getEntry(LimelightConstants.ledModeEntryName);
 		targetAcquiredEntry = limelightTable.getEntry(LimelightConstants.targetAcquiredEntryName);
 
-		setZoom(LimelightConstants.defaultZoom);
+		setLedMode(LimelightConstants.ledModePipeline);
+		setPipeline(LimelightConstants.pipelineDefault);
 	}
 
 	/**
@@ -91,88 +90,35 @@ public class LimelightCamera
 		return areaEntry.getDouble(0);
 	}
 
-	/**
-	 * Sets the camera id driver mode.
+	/***
+	 * Acitvates the selected pipeline.
 	 */
-	public void setDriveMode()
+	public void setPipeline(int pipeline)
 	{
-		camModeEntry.setDouble(LimelightConstants.camModeDriver);
-		ledOff();
+		pipelineEntry.setDouble(pipeline);
 	}
 
-	/**
-	 * Sets the camera in vision processing mode.
+	/***
+	 * Returns the camera's current pipeline.
 	 */
-	public void setVisionProcessingMode()
+	public int getPipeline()
 	{
-		camModeEntry.setDouble(LimelightConstants.camModeVsionProcessing);
-		ledOn();
+		return (int) pipelineEntry.getDouble(LimelightConstants.pipelineDefault);
 	}
 
-	/**
-	 * Toggles the vision processing mode:
+	/***
+	 * Activates the selected LED mode.
 	 */
-	public void toggleVisionProcessingMode()
+	public void setLedMode(int ledMode)
 	{
-		switch ((int) camModeEntry.getDouble(0))
-		{
-			case LimelightConstants.camModeDriver:
-				setVisionProcessingMode();
-				break;
-
-			default:
-				setDriveMode();
-		}
+		ledModeEntry.setDouble(ledMode);
 	}
 
-	/**
-	 * Turns on the LEDs.
+	/***
+	 * Returns the active LED mode.
 	 */
-	public void ledOn()
+	public int getLedMode()
 	{
-		ledModeEntry.setDouble(LimelightConstants.ledModeOn);
-	}
-
-	/**
-	 * Turns off the LEDs.
-	 */
-	public void ledOff()
-	{
-		ledModeEntry.setDouble(LimelightConstants.ledModeOff);
-	}
-
-	/**
-	 * Toggles the state of the LED.
-	 */
-	public void toggleLed()
-	{
-		switch ((int) ledModeEntry.getDouble(0))
-		{
-			case LimelightConstants.ledModeOff:
-				ledOn();
-				break;
-
-			default:
-				ledOff();
-		}
-	}
-
-	/**
-	 * Sets the zoom level of the camera.
-	 * Rhw zoom level is used directly as the pipeline numer.
-	 */
-	public void setZoom(int zoomLevel)
-	{
-		// Ensure zoom level is supported:
-		if (zoomLevel < LimelightConstants.minZoom)
-		{
-			zoomLevel = LimelightConstants.minZoom;
-		}
-		else if (zoomLevel > LimelightConstants.maxZoom)
-		{
-			zoomLevel = LimelightConstants.maxZoom;
-		}
-
-		pipelineEntry.setDouble(zoomLevel);
+		return (int) ledModeEntry.getDouble(LimelightConstants.ledModePipeline);
 	}
 }
