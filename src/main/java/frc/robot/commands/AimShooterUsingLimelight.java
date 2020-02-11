@@ -30,6 +30,8 @@ public class AimShooterUsingLimelight extends CommandBase
 	private double azimuthMaxSpeedAbs;
 	private double azimuthMinSpeedAbs;
 
+	private int[] targetingPipelines;
+
 	/**
 	 * Creates a new AimShooterUsingLimelight.
 	 */
@@ -38,15 +40,19 @@ public class AimShooterUsingLimelight extends CommandBase
 		this.shooter = shooter;
 		addRequirements(shooter);
 		limelight = LimelightCamera.getInstance();
+
+		targetingPipelines = new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+		targetingPipelines.
 	}
 
-	// Called when the command is initially scheduled.
+	/***
+	 * Called before the first call to execute for a run.
+	 * 
+	 * We assume the camera is in the desired vision processing mode.
+	 */
 	@Override
 	public void initialize()
 	{
-		//Make sure limelight is in proper mode:
-		limelight.setPipeline(LimelightConstants.pipelineZoom2);
-
 		// If the Limelight hasn't acquired a target, there is nothing much we can do.
 		if (!limelight.isTargetAcquired())
 		{
@@ -77,17 +83,18 @@ public class AimShooterUsingLimelight extends CommandBase
 	{
 		double altitudeValue = getAltitudeValue(limelight.getTargetYPosition());
 		SmartDashboard.putNumber(DashboardConstants.altitudeMotorKey, altitudeValue);
-		//shooter.setAltitude(altitudeValue);
+		shooter.setAltitude(altitudeValue);
 
 		double azimuthValue = getAzimuthValue(limelight.getTargetXPosition());
 		SmartDashboard.putNumber(DashboardConstants.azimuthMotorKey, azimuthValue);
-		//shooter.setAzimuth(azimuthValue);
+		shooter.setAzimuth(azimuthValue);
 	}
 
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted)
 	{
+		shooter.stopTurret();
 	}
 
 	// Returns true when the command should end.

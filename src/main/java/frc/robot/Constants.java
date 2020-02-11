@@ -116,9 +116,9 @@ public final class Constants
 
 	public static final class DashboardConstants
 	{
-		public static final String targetPercentageKey = "Target Percentage";
+		public static final String targetPercentageKey = "Target %";
 		public static final double targetPercentageDefault = 0.50;
-		public static final String targetVelocityKey = "Target Veolcity";
+		public static final String targetVelocityKey = "Target Velocity";
 		public static final double targetVelocityDefault = 1000;
 		public static final String setVelocityKey = "Set Veolcity";
 		public static final String maxAltitudeLimitKey = "Max Altitude";
@@ -142,11 +142,29 @@ public final class Constants
 		public static final int ledModeOff = 1;
 		public static final int ledModeOn = 3;
 
-		public static final int pipelineDriver = 0;
-		public static final int pipelineZoom1 = 1;
-		public static final int pipelineZoom2 = 2;
-		public static final int pipelineZoom3 = 3;
-		public static final int pipelineDefault = pipelineDriver;
+		public static final int pipelineDriver1 = 0;
+		public static final int pipelineDriver2 = 1;
+		public static final int pipelineDriver3 = 2;
+		public static final int pipelineVision1 = 3;
+		public static final int pipelineVision2 = 4;
+		public static final int pipelineVision3 = 5;
+		public static final int pipelineDefault = pipelineDriver1;
+
+		// The desired targeting vision processing pipeline for each
+		// pipeline. -1 represents no change.
+		public static final int[] targetingPipelines =
+		{
+			pipelineVision1,
+			pipelineVision2,
+			pipelineVision3,
+			-1,
+			-1,
+			-1,
+			pipelineVision1,
+			pipelineVision1,
+			pipelineVision1,
+			pipelineVision1
+		};
 	}
 
 	public static final class ShooterConstants
@@ -157,7 +175,7 @@ public final class Constants
 		public static final int rightMotorChannel = 23;
 		public static final int maxAltitudeLimitChannel = 9;
 		public static final int minAltitudeLimitChannel = 8;
-		public static final double altitudeUpPercentageScaleFactor = 0.40;
+		public static final double altitudeUpPercentageScaleFactor = 0.47;
 		public static final double altitudeDownPercentageScaleFactor = 0.15;
 		public static final double azimuthPercentageScaleFactor = 1.00;
 	}

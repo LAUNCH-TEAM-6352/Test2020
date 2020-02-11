@@ -27,7 +27,9 @@ import frc.robot.subsystems.Vex775proMotorSubsystem;
 import frc.util.LimelightCamera;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -136,19 +138,45 @@ public class RobotContainer
 		SmartDashboard.putNumber(DashboardConstants.targetVelocityKey, DashboardConstants.targetVelocityDefault);
 		SmartDashboard.putNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault);
 
-		SmartDashboard.putData("LL: Driver", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver)));
-		SmartDashboard.putData("LL: Zoom 1", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineZoom1)));
-		SmartDashboard.putData("LL: Zoom 2", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineZoom2)));
-		SmartDashboard.putData("LL: Zoom 3", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineZoom3)));
+		SmartDashboard.putData("LL: Driver1", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver1)));
+		SmartDashboard.putData("LL: Driver2", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver2)));
+		SmartDashboard.putData("LL: Driver3", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver3)));
+		SmartDashboard.putData("LL: Vision1", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineVision1)));
+		SmartDashboard.putData("LL: Vision2", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineVision2)));
+		SmartDashboard.putData("LL: Vision3", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineVision3)));
 
-		SmartDashboard.putData("Run Redline at Veolcity", new RunMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.targetVelocityKey));
-		SmartDashboard.putData("Run Redline at Percentage", new RunMotorAtPercentage(redlineMotorSubsystem, () -> SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, 0.0)));
+		if (shooter != null)
+		{
+			SmartDashboard.putData("Run Alt at %", new RunCommand(
+				() -> shooter.setAltitude(SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault)),
+				//() -> shooter.setAltitude(0),
+				shooter)
+			);
 
-		SmartDashboard.putData("Run 775pro at Veolcity", new RunMotorAtVelocity(vex775proMotorSubsystem, DashboardConstants.targetVelocityKey));
-		SmartDashboard.putData("Run 775pro at Percentage", new RunMotorAtPercentage(vex775proMotorSubsystem, () -> SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, 0.0)));
+			SmartDashboard.putData("Run Azm at %", new RunCommand(
+				() -> shooter.setAzimuth(SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault)),
+				//() -> shooter.setAzimuth(0),
+				shooter)
+			);
+		}
+
+		if (redlineMotorSubsystem != null)
+		{
+			SmartDashboard.putData("Run Redline at Veolcity", new RunMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.targetVelocityKey));
+			SmartDashboard.putData("Run Redline at Percentage", new RunMotorAtPercentage(redlineMotorSubsystem, () -> SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, 0.0)));
+		}
+
+		if (vex775proMotorSubsystem != null)
+		{
+			SmartDashboard.putData("Run 775pro at Veolcity", new RunMotorAtVelocity(vex775proMotorSubsystem, DashboardConstants.targetVelocityKey));
+			SmartDashboard.putData("Run 775pro at Percentage", new RunMotorAtPercentage(vex775proMotorSubsystem, () -> SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, 0.0)));
+		}
 
 		SmartDashboard.putData("Target Shooter", new SequentialCommandGroup(
-			new InstantCommand(() -> LimelightCamera.getInstance().setPipeline(LimelightConstants.pipelineZoom2)),
+			new InstantCommand(() ->
+				{
+					LimelightCamera.getInstance().setPipeline(LimelightConstants.pipelineVision1);
+				}),
 			new WaitCommand(2.0),
 			new AimShooterUsingLimelight(shooter)	
 		));

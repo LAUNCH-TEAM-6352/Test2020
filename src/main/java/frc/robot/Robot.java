@@ -82,7 +82,7 @@ public class Robot extends TimedRobot
 	public void autonomousInit()
 	{
 		// Activate proper Limelight pipeline for automomous:
-		LimelightCamera.getInstance().setPipeline(LimelightConstants.pipelineZoom2);
+		LimelightCamera.getInstance().setPipeline(LimelightConstants.pipelineVision2);
 
 		m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -105,7 +105,7 @@ public class Robot extends TimedRobot
 	public void teleopInit()
 	{
 		// Assume drivers will want to use Limelight camera for driving:
-		LimelightCamera.getInstance().setPipeline(LimelightConstants.pipelineDriver);
+		LimelightCamera.getInstance().setPipeline(LimelightConstants.pipelineDriver1);
 
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
