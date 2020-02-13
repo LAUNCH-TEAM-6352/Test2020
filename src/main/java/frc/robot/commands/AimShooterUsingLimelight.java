@@ -40,9 +40,6 @@ public class AimShooterUsingLimelight extends CommandBase
 		this.shooter = shooter;
 		addRequirements(shooter);
 		limelight = LimelightCamera.getInstance();
-
-		targetingPipelines = new int[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-		targetingPipelines.
 	}
 
 	/***
@@ -60,12 +57,13 @@ public class AimShooterUsingLimelight extends CommandBase
 		}
 
 		double sign = Math.signum(limelight.getTargetYPosition());
+		int index = sign < 0 ? 0 : 1;
 		altitudeSlope =
-			(TargetingConstants.minAltitudeSpeed * sign - TargetingConstants.maxAltitudeSpeed * sign) /
-			(TargetingConstants.minAltitudeDelta * sign - TargetingConstants.maxAltitudeDelta * sign);
-		altitudeYIntercept = TargetingConstants.maxAltitudeSpeed * sign - (altitudeSlope * TargetingConstants.maxAltitudeDelta * sign);
-		altitudeMaxSpeedAbs = TargetingConstants.maxAltitudeSpeed;
-		altitudeMinSpeedAbs = TargetingConstants.minAltitudeSpeed;
+			(TargetingConstants.minAltitudeSpeeds[index] - TargetingConstants.maxAltitudeSpeeds[index]) /
+			(TargetingConstants.minAltitudeDeltas[index] - TargetingConstants.maxAltitudeDeltas[index]);
+		altitudeYIntercept = TargetingConstants.maxAltitudeSpeeds[index] - (altitudeSlope * TargetingConstants.maxAltitudeDeltas[index]);
+		altitudeMaxSpeedAbs = Math.abs(TargetingConstants.maxAltitudeSpeeds[index]);
+		altitudeMinSpeedAbs = Math.abs(TargetingConstants.minAltitudeSpeeds[index]);
 
 		sign = Math.signum(limelight.getTargetXPosition());
 		azimuthSlope =

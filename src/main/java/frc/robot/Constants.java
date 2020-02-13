@@ -83,7 +83,7 @@ public final class Constants
 
 	public static final class Vex775proMotorConstants
 	{
-		public static final double peakVelocityUnitsPer100ms = 30000.0;
+		public static final double peakVelocityUnitsPer100ms = 24000.0;
 
 		public static final int channel = 9;
 		public static final int profileSlot = 0;
@@ -120,11 +120,19 @@ public final class Constants
 		public static final double targetPercentageDefault = 0.50;
 		public static final String targetVelocityKey = "Target Velocity";
 		public static final double targetVelocityDefault = 1000;
-		public static final String setVelocityKey = "Set Veolcity";
+		public static final String setVelocityKey = "Set Velocity";
 		public static final String maxAltitudeLimitKey = "Max Altitude";
 		public static final String minAltitudeLimitKey = "Min Altitude";
 		public static final String altitudeMotorKey = "Altitude Motor";
 		public static final String azimuthMotorKey = "Azimuth Motor";
+
+		public static final String leftShooterTargetVelocityKey = "L Shooter Vel";
+		public static final String rightShooterTargetVelocityKey = "R Shooter Vel";
+		public static final String leftShooterSetVelocityKey = "L Shooter Vel Set";
+		public static final String rightShooterSetVelocityKey = "R Shooter Vel Set";
+
+		public static final String leftShooterTargetPercentageKey = "L Shooter %";
+		public static final String rightShooterTargetPercentageKey = "R Shooter %";
 	}
 
 	public static final class LimelightConstants
@@ -188,10 +196,21 @@ public final class Constants
 		public static final double minAzimuthDelta = 0.5;
 		public static final double azimuthTolerance = 0.5;
 
-		public static final double maxAltitudeSpeed = 1.0;
-		public static final double minAltitudeSpeed = 0.3;
-		public static final double maxAltitudeDelta = 25.0;
-		public static final double minAltitudeDelta = 0.5;
+		// The altitude moves at different speeds in the different directions.
+		// Hence the different max and min values per direction.
+		// The arrays make it easier to get the desired speed based upon sign
+		public static final double maxAltitudeSpeedUp = 1.0;
+		public static final double maxAltitudeSpeedDown = -1.0;
+		public static final double[] maxAltitudeSpeeds = { maxAltitudeSpeedDown, maxAltitudeSpeedUp };
+		public static final double minAltitudeSpeedUp = 0.3;
+		public static final double minAltitudeSpeedDown = -0.3;
+		public static final double[] minAltitudeSpeeds = { minAltitudeSpeedDown, minAltitudeSpeedUp };
+		public static final double maxAltitudeDeltaUp = 25.0;
+		public static final double maxAltitudeDeltaDown = -25.0;
+		public static final double[] maxAltitudeDeltas = { maxAltitudeDeltaDown, maxAltitudeDeltaUp };
+		public static final double minAltitudeDeltaUp = 0.5;
+		public static final double minAltitudeDeltaDown = -0.5;
+		public static final double[] minAltitudeDeltas = { minAltitudeDeltaDown, minAltitudeDeltaUp };
 		public static final double altitudeTolerance = 0.5;
 	}
 }

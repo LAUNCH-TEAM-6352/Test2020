@@ -19,6 +19,7 @@ import frc.robot.commands.AimShooterUsingLimelight;
 import frc.robot.commands.RunMotorAtPercentage;
 import frc.robot.commands.RunMotorAtVelocity;
 import frc.robot.commands.RunShooterWithGameController;
+import frc.robot.commands.SetPipelineAndAimShooter;
 import frc.robot.subsystems.Falcon500MotorSubsystem;
 import frc.robot.subsystems.NeoMotorSubsystem;
 import frc.robot.subsystems.RedlineMotorSubsystem;
@@ -138,6 +139,12 @@ public class RobotContainer
 		SmartDashboard.putNumber(DashboardConstants.targetVelocityKey, DashboardConstants.targetVelocityDefault);
 		SmartDashboard.putNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault);
 
+		SmartDashboard.putNumber(DashboardConstants.leftShooterTargetVelocityKey, 0);
+		SmartDashboard.putNumber(DashboardConstants.rightShooterTargetVelocityKey, 0);
+
+		SmartDashboard.putNumber(DashboardConstants.leftShooterTargetPercentageKey, 0);
+		SmartDashboard.putNumber(DashboardConstants.rightShooterTargetPercentageKey, 0);
+
 		SmartDashboard.putData("LL: Driver1", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver1)));
 		SmartDashboard.putData("LL: Driver2", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver2)));
 		SmartDashboard.putData("LL: Driver3", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver3)));
@@ -158,6 +165,24 @@ public class RobotContainer
 				//() -> shooter.setAzimuth(0),
 				shooter)
 			);
+
+			SmartDashboard.putData("Run Shooters Vel", new StartEndCommand(
+				() -> shooter.setShooterVelocities(
+					SmartDashboard.getNumber(DashboardConstants.leftShooterTargetVelocityKey, 0),
+					SmartDashboard.getNumber(DashboardConstants.rightShooterTargetVelocityKey, 0)),
+				() -> shooter.setShooterVelocities(0, 0),
+				shooter
+				)
+			);
+
+			SmartDashboard.putData("Run Shooters %", new StartEndCommand(
+				() -> shooter.setShooterPercentages(
+					SmartDashboard.getNumber(DashboardConstants.leftShooterTargetPercentageKey, 0),
+					SmartDashboard.getNumber(DashboardConstants.rightShooterTargetPercentageKey, 0)),
+				() -> shooter.setShooterPercentages(0, 0),
+				shooter
+				)
+			);
 		}
 
 		if (redlineMotorSubsystem != null)
@@ -172,15 +197,7 @@ public class RobotContainer
 			SmartDashboard.putData("Run 775pro at Percentage", new RunMotorAtPercentage(vex775proMotorSubsystem, () -> SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, 0.0)));
 		}
 
-		SmartDashboard.putData("Target Shooter", new SequentialCommandGroup(
-			new InstantCommand(() ->
-				{
-					LimelightCamera.getInstance().setPipeline(LimelightConstants.pipelineVision1);
-				}),
-			new WaitCommand(2.0),
-			new AimShooterUsingLimelight(shooter)	
-		));
-		//SmartDashboard.putData("Target Shooter", new AimShooterUsingLimelight(shooter));
+		SmartDashboard.putData("Target Shooter", new SetPipelineAndAimShooter(shooter));
 	}
 
 	/**
