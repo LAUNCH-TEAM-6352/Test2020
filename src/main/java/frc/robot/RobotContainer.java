@@ -8,31 +8,32 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AimShooterUsingLimelight;
 import frc.robot.commands.RunMotorAtPercentage;
 import frc.robot.commands.RunMotorAtVelocity;
-import frc.robot.commands.RunShooterWithGameController;
+import frc.robot.commands.RunTurretWithGameController;
 import frc.robot.commands.SetPipelineAndAimShooter;
+import frc.robot.commands.SetShooterAltitudePid;
+import frc.robot.commands.SetShooterAltitudeProfiledPid;
 import frc.robot.subsystems.Falcon500MotorSubsystem;
 import frc.robot.subsystems.NeoMotorSubsystem;
 import frc.robot.subsystems.RedlineMotorSubsystem;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.Vex775proMotorSubsystem;
 import frc.util.LimelightCamera;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -46,10 +47,11 @@ public class RobotContainer
 	// The robot's subsystems and commands are defined here...
 	private final NeoMotorSubsystem neoMotorSubsystem = null;
 	private final Falcon500MotorSubsystem falcon500MotorSubsystem = null;
-	private RedlineMotorSubsystem redlineMotorSubsystem = null;
-	private Vex775proMotorSubsystem vex775proMotorSubsystem = null;
+	private final RedlineMotorSubsystem redlineMotorSubsystem = null;
+	private final Vex775proMotorSubsystem vex775proMotorSubsystem = null;
 
 	private Shooter shooter = null;
+	private Turret turret = null;
 
 	// I/O Devices:
 	private XboxController xboxController = null;
@@ -70,7 +72,8 @@ public class RobotContainer
 		//redlineMotorSubsystem = new RedlineMotorSubsystem();
 		//vex775proMotorSubsystem = new Vex775proMotorSubsystem();
 
-		shooter = new Shooter(xboxController);
+		//shooter = new Shooter(xboxController);
+		turret = new Turret(xboxController);
 
 		// Configure default commands:
 		if (neoMotorSubsystem != null)
@@ -101,9 +104,9 @@ public class RobotContainer
 			));
 		}
 
-		if (shooter != null)
+		if (turret != null)
 		{
-			shooter.setDefaultCommand(new RunShooterWithGameController(shooter, xboxController));
+			turret.setDefaultCommand(new RunTurretWithGameController(turret, xboxController));
 		}
 
 		// Configure the button bindings
@@ -131,7 +134,7 @@ public class RobotContainer
 			.whileHeld(new RunMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.targetVelocityKey));
 
 		new JoystickButton(xboxController, Button.kA.value)
-			.whenPressed(new AimShooterUsingLimelight(shooter));
+			.whenPressed(new AimShooterUsingLimelight(turret));
 	}
 
 	private void initSmartDashboard()
@@ -152,20 +155,25 @@ public class RobotContainer
 		SmartDashboard.putData("LL: Vision2", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineVision2)));
 		SmartDashboard.putData("LL: Vision3", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineVision3)));
 
-		if (shooter != null)
+		if (turret != null)
 		{
 			SmartDashboard.putData("Run Alt at %", new RunCommand(
-				() -> shooter.setAltitude(SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault)),
+				() -> turret.setAltitude(SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault)),
 				//() -> shooter.setAltitude(0),
-				shooter)
+				turret)
 			);
 
 			SmartDashboard.putData("Run Azm at %", new RunCommand(
-				() -> shooter.setAzimuth(SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault)),
+				() -> turret.setAzimuth(SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault)),
 				//() -> shooter.setAzimuth(0),
-				shooter)
+				turret)
 			);
 
+			SmartDashboard.putData("Target Alt", new SetShooterAltitudePid(turret));
+		}
+
+		if (shooter != null)
+		{
 			SmartDashboard.putData("Run Shooters Vel", new StartEndCommand(
 				() -> shooter.setShooterVelocities(
 					SmartDashboard.getNumber(DashboardConstants.leftShooterTargetVelocityKey, 0),
@@ -197,7 +205,7 @@ public class RobotContainer
 			SmartDashboard.putData("Run 775pro at Percentage", new RunMotorAtPercentage(vex775proMotorSubsystem, () -> SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, 0.0)));
 		}
 
-		SmartDashboard.putData("Target Shooter", new SetPipelineAndAimShooter(shooter));
+		SmartDashboard.putData("Target Shooter", new SetPipelineAndAimShooter(turret));
 	}
 
 	/**

@@ -175,17 +175,21 @@ public final class Constants
 		};
 	}
 
-	public static final class ShooterConstants
+	public static final class TurretConstants
 	{
 		public static final int altitudeMotorChannel = 20;
 		public static final int azimuthMotorChannel = 21;
-		public static final int leftMotorChannel = 22;
-		public static final int rightMotorChannel = 23;
 		public static final int maxAltitudeLimitChannel = 9;
 		public static final int minAltitudeLimitChannel = 8;
 		public static final double altitudeUpPercentageScaleFactor = 0.47;
 		public static final double altitudeDownPercentageScaleFactor = 0.15;
 		public static final double azimuthPercentageScaleFactor = 1.00;
+	}
+
+	public static final class ShooterConstants
+	{
+		public static final int leftMotorChannel = 22;
+		public static final int rightMotorChannel = 23;
 	}
 
 	public static final class TargetingConstants

@@ -13,11 +13,12 @@ import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.TargetingConstants;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Turret;
 import frc.util.LimelightCamera;
 
 public class AimShooterUsingLimelight extends CommandBase
 {
-	private Shooter shooter;
+	private Turret turret;
 	private LimelightCamera limelight;
 
 	private double altitudeSlope;
@@ -30,15 +31,13 @@ public class AimShooterUsingLimelight extends CommandBase
 	private double azimuthMaxSpeedAbs;
 	private double azimuthMinSpeedAbs;
 
-	private int[] targetingPipelines;
-
 	/**
 	 * Creates a new AimShooterUsingLimelight.
 	 */
-	public AimShooterUsingLimelight(Shooter shooter)
+	public AimShooterUsingLimelight(Turret turret)
 	{
-		this.shooter = shooter;
-		addRequirements(shooter);
+		this.turret = turret;
+		addRequirements(turret);
 		limelight = LimelightCamera.getInstance();
 	}
 
@@ -81,18 +80,18 @@ public class AimShooterUsingLimelight extends CommandBase
 	{
 		double altitudeValue = getAltitudeValue(limelight.getTargetYPosition());
 		SmartDashboard.putNumber(DashboardConstants.altitudeMotorKey, altitudeValue);
-		shooter.setAltitude(altitudeValue);
+		//turret.setAltitude(altitudeValue);
 
 		double azimuthValue = getAzimuthValue(limelight.getTargetXPosition());
 		SmartDashboard.putNumber(DashboardConstants.azimuthMotorKey, azimuthValue);
-		shooter.setAzimuth(azimuthValue);
+		//turret.setAzimuth(azimuthValue);
 	}
 
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted)
 	{
-		shooter.stopTurret();
+		//turret.stop();
 	}
 
 	// Returns true when the command should end.

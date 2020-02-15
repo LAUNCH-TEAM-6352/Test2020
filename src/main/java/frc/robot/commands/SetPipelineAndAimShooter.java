@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.LimelightConstants;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Turret;
 import frc.util.LimelightCamera;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -22,7 +22,7 @@ public class SetPipelineAndAimShooter extends SequentialCommandGroup {
   /**
    * Creates a new SetPipelineAndAimShooter.
    */
-  public SetPipelineAndAimShooter(Shooter shooter) {
+  public SetPipelineAndAimShooter(Turret turret) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super(
@@ -37,7 +37,7 @@ public class SetPipelineAndAimShooter extends SequentialCommandGroup {
 			new WaitCommand(0),
 			() -> LimelightConstants.targetingPipelines[LimelightCamera.getInstance().getPipeline()] >= 0
 		),
-		new AimShooterUsingLimelight(shooter)	
+		new AimShooterUsingLimelight(turret)	
 
 	);
   }

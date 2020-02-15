@@ -11,12 +11,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-//import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DashboardConstants;
@@ -25,12 +21,6 @@ import frc.robot.Constants.Vex775proMotorConstants;
 
 public class Shooter extends SubsystemBase
 {
-	private VictorSPX altitudeMotor = new VictorSPX(ShooterConstants.altitudeMotorChannel);
-	private VictorSPX azimuthMotor = new VictorSPX(ShooterConstants.azimuthMotorChannel);
-
-	private DigitalInput maxAltitudeLimit = new DigitalInput(ShooterConstants.maxAltitudeLimitChannel);
-	private DigitalInput minAltitudeLimit = new DigitalInput(ShooterConstants.minAltitudeLimitChannel);
-
 	private TalonSRX leftMotor = new TalonSRX(ShooterConstants.leftMotorChannel);
 	private TalonSRX rightMotor = new TalonSRX(ShooterConstants.rightMotorChannel);
 
@@ -42,9 +32,6 @@ public class Shooter extends SubsystemBase
 	public Shooter(XboxController controller)
 	{
 		this.controller = controller;
-
-		altitudeMotor.setInverted(InvertType.InvertMotorOutput);
-		azimuthMotor.setInverted(InvertType.InvertMotorOutput);
 
 		rightMotor.setInverted(InvertType.InvertMotorOutput);
 
@@ -70,43 +57,6 @@ public class Shooter extends SubsystemBase
 			motor.selectProfileSlot(Vex775proMotorConstants.profileSlot, Vex775proMotorConstants.primaryClosedLoop);
 			motor.setSensorPhase(Vex775proMotorConstants.phase);
 		}
-	}
-
-	/**
-	 * Run altitude mtor at specified percantage.
-	 * 
-	 * @param percentage
-	 */
-	public void setAltitude(double percentage)
-	{
-		if (percentage > 0 && !maxAltitudeLimit.get() || percentage < 0 && !minAltitudeLimit.get())
-		{
-			percentage = 0;
-			controller.setRumble(RumbleType.kRightRumble, 1);
-		}
-		else
-		{
-			controller.setRumble(RumbleType.kRightRumble, 0);
-		}
-
-		SmartDashboard.putNumber(DashboardConstants.altitudeMotorKey, percentage);
-
-		// Scale percentage to reasonable speed:
-		percentage *= percentage < 0
-			? ShooterConstants.altitudeDownPercentageScaleFactor
-			: ShooterConstants.altitudeUpPercentageScaleFactor;
-		altitudeMotor.set(ControlMode.PercentOutput, percentage);
-	}
-
-	/**
-	 * Run azimuth motor at specified percantage.
-	 * 
-	 * @param percentage
-	 */
-	public void setAzimuth(double percentage)
-	{
-		SmartDashboard.putNumber(DashboardConstants.azimuthMotorKey, percentage);
-		azimuthMotor.set(ControlMode.PercentOutput, percentage * ShooterConstants.azimuthPercentageScaleFactor);
 	}
 
 	/***
@@ -139,26 +89,10 @@ public class Shooter extends SubsystemBase
 	}
 
 	/***
-	 * Convenience method to stop all turret motion.
-	 */
-	public void stopTurret()
-	{
-		setAltitude(0);
-		setAzimuth(0);
-	}
-
-	/***
 	 * Stops the shooter motors.
 	 */
-	public void stopShooters()
+	public void stop()
 	{
 		setShooterPercentages(0, 0);
-	}
-	
-	@Override
-	public void periodic()
-	{
-		SmartDashboard.putBoolean(DashboardConstants.maxAltitudeLimitKey, maxAltitudeLimit.get());
-		SmartDashboard.putBoolean(DashboardConstants.minAltitudeLimitKey, minAltitudeLimit.get());
 	}
 }

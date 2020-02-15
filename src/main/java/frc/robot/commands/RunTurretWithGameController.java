@@ -7,34 +7,30 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.MotorSubsystemBase;
-import frc.robot.subsystems.Shooter;
-
-import java.util.function.DoubleSupplier;
-
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Turret;
 
 /**
  * An example command that uses an example subsystem.
  */
-public class RunShooterWithGameController extends CommandBase
+public class RunTurretWithGameController extends CommandBase
 {
 	@SuppressWarnings(
 	{ "PMD.UnusedPrivateField", "PMD.SingularField" })
-	private final Shooter shooter;
+	private final Turret turret;
 	private final XboxController controller;
 
-	public RunShooterWithGameController(Shooter shooter, XboxController controller)
+	public RunTurretWithGameController(Turret turret, XboxController controller)
 	{
-		this.shooter = shooter;
+		this.turret = turret;
 		this.controller = controller;
 
 		// Use addRequirements() here to declare subsystem dependencies.
-		if (shooter != null)
+		if (turret != null)
 		{
-			addRequirements(shooter);
+			addRequirements(turret);
 		}
 	}
 
@@ -48,10 +44,10 @@ public class RunShooterWithGameController extends CommandBase
 	@Override
 	public void execute()
 	{
-		if (shooter != null)
+		if (turret != null)
 		{
-			shooter.setAltitude(controller.getY(Hand.kRight) * -1.0);
-			shooter.setAzimuth(controller.getX(Hand.kRight));
+			turret.setAltitude(controller.getY(Hand.kRight) * -1.0);
+			turret.setAzimuth(controller.getX(Hand.kRight));
 		}
 	}
 
@@ -59,7 +55,7 @@ public class RunShooterWithGameController extends CommandBase
 	@Override
 	public void end(boolean interrupted)
 	{
-		shooter.stopTurret();
+		turret.stop();
 	}
 
 	// Returns true when the command should end.
