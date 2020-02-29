@@ -21,8 +21,8 @@ import frc.robot.Constants.Vex775proMotorConstants;
 
 public class Shooter extends SubsystemBase
 {
-	private TalonSRX leftMotor = new TalonSRX(ShooterConstants.leftMotorChannel);
-	private TalonSRX rightMotor = new TalonSRX(ShooterConstants.rightMotorChannel);
+	private TalonSRX masterMotor = new TalonSRX(ShooterConstants.leftMotorChannel);
+	private TalonSRX slaveMotor = new TalonSRX(ShooterConstants.rightMotorChannel);
 
 	private XboxController controller;
 
@@ -33,9 +33,12 @@ public class Shooter extends SubsystemBase
 	{
 		this.controller = controller;
 
-		rightMotor.setInverted(InvertType.InvertMotorOutput);
+		masterMotor.setInverted(ShooterConstants.leftMotorInverted);
+		slaveMotor.setInverted(ShooterConstants.rightMotorInverted);
 
-		for (TalonSRX motor : new TalonSRX[] { leftMotor, rightMotor})
+		slaveMotor.set(ControlMode.Follower, masterMotor.getDeviceID());
+
+		for (TalonSRX motor : new TalonSRX[] { masterMotor, slaveMotor})
 		{
 			motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
 			motor.configAllowableClosedloopError(Vex775proMotorConstants.profileSlot, Vex775proMotorConstants.pidAllowableError,
@@ -60,32 +63,25 @@ public class Shooter extends SubsystemBase
 	}
 
 	/***
-	 * Sets the shooter motor speeds in velocity.
+	 * Sets the shooter motor speeds in velocity (RPM).
 	 */
-	public void setShooterVelocities(double left, double right)
+	public void setVelocity(double veolcity)
 	{
 		// Velocity is measured in encoder units per 100 ms.
 
-		var leftUnitsPer100Ms =
-			left * Vex775proMotorConstants.countsPerRevolution * Vex775proMotorConstants.ticksPerCount
+		var unitsPer100Ms =
+			veolcity * Vex775proMotorConstants.countsPerRevolution * Vex775proMotorConstants.ticksPerCount
 			/ (60.0 * 1000.0 / 100.0);
-		SmartDashboard.putNumber(DashboardConstants.leftShooterSetVelocityKey, leftUnitsPer100Ms);
-		leftMotor.set(ControlMode.Velocity, leftUnitsPer100Ms);
-
-		var rightUnitsPer100Ms =
-			right * Vex775proMotorConstants.countsPerRevolution * Vex775proMotorConstants.ticksPerCount
-			/ (60.0 * 1000.0 / 100.0);
-		SmartDashboard.putNumber(DashboardConstants.rightShooterSetVelocityKey, rightUnitsPer100Ms);
-		rightMotor.set(ControlMode.Velocity, rightUnitsPer100Ms);
+		SmartDashboard.putNumber(DashboardConstants.shooterSetVelocityKey, unitsPer100Ms);
+		masterMotor.set(ControlMode.Velocity, unitsPer100Ms);
 	}
 
 	/***
-	 * Sets thwe shooter motor speeds in percentage.
+	 * Sets the shooter motor speeds in percentage.
 	 */
-	public void setShooterPercentages(double left, double right)
+	public void setPercentage(double percentage)
 	{
-		leftMotor.set(ControlMode.PercentOutput, left);
-		rightMotor.set(ControlMode.PercentOutput, right);
+		masterMotor.set(ControlMode.PercentOutput, percentage);
 	}
 
 	/***
@@ -93,6 +89,6 @@ public class Shooter extends SubsystemBase
 	 */
 	public void stop()
 	{
-		setShooterPercentages(0, 0);
+		setPercentage(0);
 	}
 }

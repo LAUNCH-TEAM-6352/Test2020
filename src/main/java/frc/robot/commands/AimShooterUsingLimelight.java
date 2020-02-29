@@ -79,7 +79,7 @@ public class AimShooterUsingLimelight extends CommandBase
 	public void execute()
 	{
 		double altitudeValue = getAltitudeValue(limelight.getTargetYPosition());
-		SmartDashboard.putNumber(DashboardConstants.altitudeMotorKey, altitudeValue);
+		SmartDashboard.putNumber(DashboardConstants.hoodMotorKey, altitudeValue);
 		//turret.setAltitude(altitudeValue);
 
 		double azimuthValue = getAzimuthValue(limelight.getTargetXPosition());

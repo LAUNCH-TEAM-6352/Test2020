@@ -17,33 +17,37 @@ import frc.util.LimelightCamera;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
-public class SetShooterAltitudePid extends PIDCommand {
-  /**
-   * Creates a new SetShooterAltitudePid.
-   */
-  public SetShooterAltitudePid(Turret turret) {
-    super(
-        // The controller that the command will use
-        new PIDController(3, .001, 0),
-        // This should return the measurement
-        () -> LimelightCamera.getInstance().getTargetYPosition(),
-        // This should return the setpoint (can also be a constant)
-        () -> 0,
-        // This uses the output
-        output -> {
-		  // Use the output here
-		  SmartDashboard.putNumber(DashboardConstants.altitudeMotorKey, output);
-		  //turret.setAltitude(output);
-        });
-    // Use addRequirements() here to declare subsystem dependencies.
-	// Configure additional PID options by calling `getController` here.
-	getController().setTolerance(0.1);
-	getController().setIntegratorRange(-1000, 1000);
-  }
+public class SetShooterAltitudePid extends PIDCommand
+{
+	/**
+	 * Creates a new SetShooterAltitudePid.
+	 */
+	public SetShooterAltitudePid(Turret turret)
+	{
+		super(
+				// The controller that the command will use
+				new PIDController(3, .001, 0),
+				// This should return the measurement
+				() -> LimelightCamera.getInstance().getTargetYPosition(),
+				// This should return the setpoint (can also be a constant)
+				() -> 0,
+				// This uses the output
+				output ->
+				{
+					// Use the output here
+					SmartDashboard.putNumber(DashboardConstants.hoodMotorKey, output);
+					// turret.setAltitude(output);
+				});
+		// Use addRequirements() here to declare subsystem dependencies.
+		// Configure additional PID options by calling `getController` here.
+		getController().setTolerance(0.1);
+		getController().setIntegratorRange(-1000, 1000);
+	}
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return getController().atSetpoint();
-  }
+	// Returns true when the command should end.
+	@Override
+	public boolean isFinished()
+	{
+		return getController().atSetpoint();
+	}
 }

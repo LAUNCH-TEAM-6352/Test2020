@@ -25,8 +25,6 @@ import frc.robot.commands.RunMotorAtPercentage;
 import frc.robot.commands.RunMotorAtVelocity;
 import frc.robot.commands.RunTurretWithGameController;
 import frc.robot.commands.SetPipelineAndAimShooter;
-import frc.robot.commands.SetShooterAltitudePid;
-import frc.robot.commands.SetShooterAltitudeProfiledPid;
 import frc.robot.subsystems.Falcon500MotorSubsystem;
 import frc.robot.subsystems.NeoMotorSubsystem;
 import frc.robot.subsystems.RedlineMotorSubsystem;
@@ -72,7 +70,7 @@ public class RobotContainer
 		//redlineMotorSubsystem = new RedlineMotorSubsystem();
 		//vex775proMotorSubsystem = new Vex775proMotorSubsystem();
 
-		//shooter = new Shooter(xboxController);
+		shooter = new Shooter(xboxController);
 		turret = new Turret(xboxController);
 
 		// Configure default commands:
@@ -109,6 +107,14 @@ public class RobotContainer
 			turret.setDefaultCommand(new RunTurretWithGameController(turret, xboxController));
 		}
 
+		if (shooter != null)
+		{
+			shooter.setDefaultCommand(new RunCommand(
+				() -> shooter.setPercentage(xboxController.getTriggerAxis(Hand.kLeft)),
+				shooter
+			));
+		}
+
 		// Configure the button bindings
 		configureButtonBindings();
 
@@ -133,8 +139,11 @@ public class RobotContainer
 		new JoystickButton(xboxController, Button.kY.value)
 			.whileHeld(new RunMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.targetVelocityKey));
 
-		new JoystickButton(xboxController, Button.kA.value)
-			.whenPressed(new AimShooterUsingLimelight(turret));
+		if (turret != null)
+		{
+			new JoystickButton(xboxController, Button.kA.value)
+				.whenPressed(new AimShooterUsingLimelight(turret));
+		}
 	}
 
 	private void initSmartDashboard()
@@ -142,11 +151,9 @@ public class RobotContainer
 		SmartDashboard.putNumber(DashboardConstants.targetVelocityKey, DashboardConstants.targetVelocityDefault);
 		SmartDashboard.putNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault);
 
-		SmartDashboard.putNumber(DashboardConstants.leftShooterTargetVelocityKey, 0);
-		SmartDashboard.putNumber(DashboardConstants.rightShooterTargetVelocityKey, 0);
+		SmartDashboard.putNumber(DashboardConstants.shooterTargetVelocityKey, DashboardConstants.shooterTargetVelocityDefault);
 
-		SmartDashboard.putNumber(DashboardConstants.leftShooterTargetPercentageKey, 0);
-		SmartDashboard.putNumber(DashboardConstants.rightShooterTargetPercentageKey, 0);
+		SmartDashboard.putNumber(DashboardConstants.shooterTargetPercentageKey, 0);
 
 		SmartDashboard.putData("LL: Driver1", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver1)));
 		SmartDashboard.putData("LL: Driver2", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver2)));
@@ -157,8 +164,8 @@ public class RobotContainer
 
 		if (turret != null)
 		{
-			SmartDashboard.putData("Run Alt at %", new RunCommand(
-				() -> turret.setAltitude(SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault)),
+			SmartDashboard.putData("Run Hood at %", new RunCommand(
+				() -> turret.setHood(SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault)),
 				//() -> shooter.setAltitude(0),
 				turret)
 			);
@@ -169,25 +176,23 @@ public class RobotContainer
 				turret)
 			);
 
-			SmartDashboard.putData("Target Alt", new SetShooterAltitudePid(turret));
+			SmartDashboard.putData("Target Shooter", new SetPipelineAndAimShooter(turret));
 		}
 
 		if (shooter != null)
 		{
-			SmartDashboard.putData("Run Shooters Vel", new StartEndCommand(
-				() -> shooter.setShooterVelocities(
-					SmartDashboard.getNumber(DashboardConstants.leftShooterTargetVelocityKey, 0),
-					SmartDashboard.getNumber(DashboardConstants.rightShooterTargetVelocityKey, 0)),
-				() -> shooter.setShooterVelocities(0, 0),
+			SmartDashboard.putData("Run Shooter Vel", new StartEndCommand(
+				() -> shooter.setVelocity(
+					SmartDashboard.getNumber(DashboardConstants.shooterTargetVelocityKey, 0)),
+				() -> shooter.setPercentage(0),
 				shooter
 				)
 			);
 
-			SmartDashboard.putData("Run Shooters %", new StartEndCommand(
-				() -> shooter.setShooterPercentages(
-					SmartDashboard.getNumber(DashboardConstants.leftShooterTargetPercentageKey, 0),
-					SmartDashboard.getNumber(DashboardConstants.rightShooterTargetPercentageKey, 0)),
-				() -> shooter.setShooterPercentages(0, 0),
+			SmartDashboard.putData("Run Shooter %", new StartEndCommand(
+				() -> shooter.setPercentage(
+					SmartDashboard.getNumber(DashboardConstants.shooterTargetPercentageKey, 0)),
+				() -> shooter.setPercentage(0),
 				shooter
 				)
 			);
@@ -205,7 +210,6 @@ public class RobotContainer
 			SmartDashboard.putData("Run 775pro at Percentage", new RunMotorAtPercentage(vex775proMotorSubsystem, () -> SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, 0.0)));
 		}
 
-		SmartDashboard.putData("Target Shooter", new SetPipelineAndAimShooter(turret));
 	}
 
 	/**

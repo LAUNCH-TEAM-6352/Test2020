@@ -46,7 +46,7 @@ public class RunTurretWithGameController extends CommandBase
 	{
 		if (turret != null)
 		{
-			turret.setAltitude(controller.getY(Hand.kRight) * -1.0);
+			turret.setHood(controller.getY(Hand.kRight) * -1.0);
 			turret.setAzimuth(controller.getX(Hand.kRight));
 		}
 	}

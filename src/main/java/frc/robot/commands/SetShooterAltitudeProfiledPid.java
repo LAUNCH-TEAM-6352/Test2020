@@ -37,7 +37,7 @@ public class SetShooterAltitudeProfiledPid extends ProfiledPIDCommand {
         // This uses the output
         (output, setpoint) -> {
           // Use the output (and setpoint, if desired) here
-		  SmartDashboard.putNumber(DashboardConstants.altitudeMotorKey, output);
+		  SmartDashboard.putNumber(DashboardConstants.hoodMotorKey, output);
 		});
     // Use addRequirements() here to declare subsystem dependencies.
 	// Configure additional PID options by calling `getController` here.

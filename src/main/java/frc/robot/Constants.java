@@ -83,7 +83,12 @@ public final class Constants
 
 	public static final class Vex775proMotorConstants
 	{
-		public static final double peakVelocityUnitsPer100ms = 24000.0;
+		// This is the output of the 4:1 gearbox:
+		public static final double peakVelocityUnitsPer100ms = 20500.0;
+
+		// These are for a target velocity of 2,500 RPM
+		public static final double targetVelocityUnitsPer100ms = 17100.0;
+		public static final double targetPercentage  = 0.72;
 
 		public static final int channel = 9;
 		public static final int profileSlot = 0;
@@ -91,7 +96,7 @@ public final class Constants
 		public static final double pidI = 0.00001;
 		public static final double pidD = 0.03;
 		public static final int pidIZ = 3000;
-		public static final double pidFF = 1023.0 / peakVelocityUnitsPer100ms;
+		public static final double pidFF = targetPercentage * 1023.0 / targetVelocityUnitsPer100ms;
 		public static final double pidPeakOutput = 1;
 		public static final int pidLoopPeriodMs = 1;
 		public static final double pidMaxIntegralAccum = 0;
@@ -121,18 +126,18 @@ public final class Constants
 		public static final String targetVelocityKey = "Target Velocity";
 		public static final double targetVelocityDefault = 1000;
 		public static final String setVelocityKey = "Set Velocity";
-		public static final String maxAltitudeLimitKey = "Max Altitude";
-		public static final String minAltitudeLimitKey = "Min Altitude";
-		public static final String altitudeMotorKey = "Altitude Motor";
+		public static final String downHoodLimitKey = "Hood Down";
+		public static final String hoodMotorKey = "Hood Motor";
 		public static final String azimuthMotorKey = "Azimuth Motor";
+		public static final String leftAzimuthLimitKey = "Azimuth Left";
+		public static final String frontAzimuthLimitKey = "Azimuth Front";
+		public static final String rightAzimuthLimitKey = "Azimuth Right";
 
-		public static final String leftShooterTargetVelocityKey = "L Shooter Vel";
-		public static final String rightShooterTargetVelocityKey = "R Shooter Vel";
-		public static final String leftShooterSetVelocityKey = "L Shooter Vel Set";
-		public static final String rightShooterSetVelocityKey = "R Shooter Vel Set";
+		public static final double shooterTargetVelocityDefault = 2500;
+		public static final String shooterTargetVelocityKey = "Shooter Vel";
+		public static final String shooterSetVelocityKey = "Shooter Vel Set";
 
-		public static final String leftShooterTargetPercentageKey = "L Shooter %";
-		public static final String rightShooterTargetPercentageKey = "R Shooter %";
+		public static final String shooterTargetPercentageKey = "Shooter %";
 	}
 
 	public static final class LimelightConstants
@@ -177,12 +182,17 @@ public final class Constants
 
 	public static final class TurretConstants
 	{
-		public static final int altitudeMotorChannel = 20;
+		public static final int hoodMotorChannel = 20;
 		public static final int azimuthMotorChannel = 21;
-		public static final int maxAltitudeLimitChannel = 9;
-		public static final int minAltitudeLimitChannel = 8;
-		public static final double altitudeUpPercentageScaleFactor = 0.47;
-		public static final double altitudeDownPercentageScaleFactor = 0.15;
+
+		public static final int downHoodLimitChannel = 9;
+
+		public static final int leftAzimuthLimitChannel = 5; 
+		public static final int frontAzimuthLimitChannel = 6; 
+		public static final int rightAzimuthLimitChannel = 7; 
+
+		public static final double hoodUpPercentageScaleFactor = 0.47;
+		public static final double hoodDownPercentageScaleFactor = 0.15;
 		public static final double azimuthPercentageScaleFactor = 1.00;
 	}
 
@@ -190,6 +200,8 @@ public final class Constants
 	{
 		public static final int leftMotorChannel = 22;
 		public static final int rightMotorChannel = 23;
+		public static final boolean leftMotorInverted = false;
+		public static final boolean rightMotorInverted = true;
 	}
 
 	public static final class TargetingConstants
