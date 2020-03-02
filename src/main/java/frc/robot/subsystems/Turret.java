@@ -25,16 +25,27 @@ import frc.robot.Constants.TurretConstants;
  */
 public class Turret extends SubsystemBase
 {
+	private enum AzimuthPosition
+	{
+		Unknown,
+		LeftOfCenter,
+		Center,
+		RightOfCenter
+	}
+
 	private TalonSRX hoodMotor = new TalonSRX(TurretConstants.hoodMotorChannel);
 	private VictorSPX azimuthMotor = new VictorSPX(TurretConstants.azimuthMotorChannel);
 
 	private DigitalInput downHoodLimit = new DigitalInput(TurretConstants.downHoodLimitChannel);
 
 	private DigitalInput leftAzimuthLimit = new DigitalInput(TurretConstants.leftAzimuthLimitChannel);
-	private DigitalInput frontAzimuthLimit = new DigitalInput(TurretConstants.frontAzimuthLimitChannel);
+	private DigitalInput centerAzimuthLimit = new DigitalInput(TurretConstants.centerAzimuthLimitChannel);
 	private DigitalInput rightAzimuthLimit = new DigitalInput(TurretConstants.rightAzimuthLimitChannel);
 
 	private XboxController controller;
+
+	// Where qwe think we are:
+	private AzimuthPosition currentAzimuthPosition = AzimuthPosition.Unknown;
 
 	/**
 	 * Creates an instance.
@@ -43,8 +54,11 @@ public class Turret extends SubsystemBase
 	{
 		this.controller = controller;
 
-		hoodMotor.setInverted(InvertType.InvertMotorOutput);
-		azimuthMotor.setInverted(InvertType.InvertMotorOutput);
+		hoodMotor.setInverted(TurretConstants.isHoodMotorInverted);
+		azimuthMotor.setInverted(TurretConstants.isAzimuthMotorInverted);
+
+		// If the azimuth is at a limit switch, this will set its current position:
+		setCurrentAzimuthPosition();
 	}
 
 	/**
@@ -80,18 +94,78 @@ public class Turret extends SubsystemBase
 	 */
 	public void setAzimuth(double percentage)
 	{
-		if (percentage > 0 && !rightAzimuthLimit.get() || percentage < 0 && !leftAzimuthLimit.get())
+		// See if we are moving through the center position:
+		if (!centerAzimuthLimit.get())
 		{
-			percentage = 0;
-			controller.setRumble(RumbleType.kRightRumble, 1);
+			currentAzimuthPosition = AzimuthPosition.Center;
+		}
+		
+		boolean isRumble = false;
+		if (percentage > 0)
+		{
+			// We are moving to the right.
+			if (currentAzimuthPosition == AzimuthPosition.Center && centerAzimuthLimit.get())
+			{
+				// We were at center but not anymore:
+				currentAzimuthPosition = AzimuthPosition.RightOfCenter;
+			}
+			else if (!rightAzimuthLimit.get())
+			{
+				// We are all the way to the right:
+				currentAzimuthPosition = AzimuthPosition.RightOfCenter;
+				percentage = 0;
+				isRumble = true;
+			}
+		}
+		else if (percentage < 0)
+		{
+			// We are movine to the left.
+			if (currentAzimuthPosition == AzimuthPosition.Center && centerAzimuthLimit.get())
+			{
+				// We were at center but nut anymore:
+				currentAzimuthPosition = AzimuthPosition.LeftOfCenter;
+			}
+			else if (!leftAzimuthLimit.get())
+			{
+				// We are all the way to the left:
+				currentAzimuthPosition = AzimuthPosition.LeftOfCenter;
+				percentage = 0;
+				isRumble = true;
+			}
+		}
+
+		controller.setRumble(RumbleType.kRightRumble, isRumble ? 1 : 0);
+		SmartDashboard.putNumber(DashboardConstants.azimuthMotorKey, percentage);
+		azimuthMotor.set(ControlMode.PercentOutput, percentage * TurretConstants.azimuthPercentageScaleFactor);
+	}
+
+	/**
+	 * Moves the turret towards the center (front) position.
+	 */
+	public void moveToCenterPosition()
+	{
+		if (!centerAzimuthLimit.get())
+		{
+			// We are at center, do not move anymore:
+			currentAzimuthPosition = AzimuthPosition.Center;
+			setAzimuth(0);
+		}
+		else if (!leftAzimuthLimit.get() || currentAzimuthPosition == AzimuthPosition.LeftOfCenter)
+		{
+			currentAzimuthPosition = AzimuthPosition.LeftOfCenter;
+			setAzimuth(TurretConstants.moveToRightAutoPercentage);
+		}
+		else if (!rightAzimuthLimit.get() || currentAzimuthPosition == AzimuthPosition.RightOfCenter)
+		{
+			currentAzimuthPosition = AzimuthPosition.RightOfCenter;
+			setAzimuth(TurretConstants.moveToLeftAutoPercentage);
 		}
 		else
 		{
-			controller.setRumble(RumbleType.kRightRumble, 0);
+			// We do not know where we are at, move left until we
+			// hit center or all the way left.
+			setAzimuth(TurretConstants.moveToRightAutoPercentage);
 		}
-
-		SmartDashboard.putNumber(DashboardConstants.azimuthMotorKey, percentage);
-		azimuthMotor.set(ControlMode.PercentOutput, percentage * TurretConstants.azimuthPercentageScaleFactor);
 	}
 
 	/***
@@ -104,25 +178,39 @@ public class Turret extends SubsystemBase
 	}
 
 	/**
-	 * Indicates if the azimuth is at the front position.
+	 * If possible, set the current azimuth position.
 	 */
-	public boolean isAtFront()
+	public void setCurrentAzimuthPosition()
 	{
-		return !frontAzimuthLimit.get();
+		if (!leftAzimuthLimit.get())
+		{
+			currentAzimuthPosition = AzimuthPosition.LeftOfCenter;
+		}
+		else if (!centerAzimuthLimit.get())
+		{
+			currentAzimuthPosition = AzimuthPosition.Center;
+		}
+		else if (!rightAzimuthLimit.get())
+		{
+			currentAzimuthPosition = AzimuthPosition.RightOfCenter;
+		}
 	}
 
-	public boolean isToLeftOfFront()
+	/**
+	 * Indicates if the azimuth is at the center (front) position.
+	 */
+	public boolean isAtCenterPosition()
 	{
-		return false;
+		return !centerAzimuthLimit.get();
 	}
-	
+
 	@Override
 	public void periodic()
 	{
 		SmartDashboard.putBoolean(DashboardConstants.downHoodLimitKey, downHoodLimit.get());
 
 		SmartDashboard.putBoolean(DashboardConstants.leftAzimuthLimitKey, leftAzimuthLimit.get());
-		SmartDashboard.putBoolean(DashboardConstants.frontAzimuthLimitKey, frontAzimuthLimit.get());
+		SmartDashboard.putBoolean(DashboardConstants.frontAzimuthLimitKey, centerAzimuthLimit.get());
 		SmartDashboard.putBoolean(DashboardConstants.rightAzimuthLimitKey, rightAzimuthLimit.get());
 	}
 }

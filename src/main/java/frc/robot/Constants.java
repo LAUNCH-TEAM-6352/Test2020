@@ -105,11 +105,9 @@ public final class Constants
 		public static final double pidMinOutput = -1.0;
 		public static final double idMaxOutput = 1.0;
 
-
 		public static final int countsPerRevolution = 1024;
 		public static final int ticksPerCount = 4;
 		public static final int primaryClosedLoop = 0;
-
 
 		public static final boolean phase = false;
 	}
@@ -188,20 +186,26 @@ public final class Constants
 		public static final int downHoodLimitChannel = 9;
 
 		public static final int leftAzimuthLimitChannel = 5; 
-		public static final int frontAzimuthLimitChannel = 6; 
-		public static final int rightAzimuthLimitChannel = 7; 
+		public static final int centerAzimuthLimitChannel = 6; 
+		public static final int rightAzimuthLimitChannel = 7;
+		
+		public static final boolean isAzimuthMotorInverted = true;
+		public static final boolean isHoodMotorInverted = false;
 
 		public static final double hoodUpPercentageScaleFactor = 0.47;
 		public static final double hoodDownPercentageScaleFactor = 0.15;
 		public static final double azimuthPercentageScaleFactor = 1.00;
+
+		public static final double moveToLeftAutoPercentage = -1.0;
+		public final static double moveToRightAutoPercentage = +1.0;
 	}
 
 	public static final class ShooterConstants
 	{
 		public static final int leftMotorChannel = 22;
 		public static final int rightMotorChannel = 23;
-		public static final boolean leftMotorInverted = false;
-		public static final boolean rightMotorInverted = true;
+		public static final boolean isLeftMotorInverted = false;
+		public static final boolean isRightMotorInverted = true;
 	}
 
 	public static final class TargetingConstants

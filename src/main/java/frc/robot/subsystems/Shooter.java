@@ -33,8 +33,8 @@ public class Shooter extends SubsystemBase
 	{
 		this.controller = controller;
 
-		masterMotor.setInverted(ShooterConstants.leftMotorInverted);
-		slaveMotor.setInverted(ShooterConstants.rightMotorInverted);
+		masterMotor.setInverted(ShooterConstants.isLeftMotorInverted);
+		slaveMotor.setInverted(ShooterConstants.isRightMotorInverted);
 
 		slaveMotor.set(ControlMode.Follower, masterMotor.getDeviceID());
 
