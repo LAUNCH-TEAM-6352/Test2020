@@ -125,11 +125,13 @@ public final class Constants
 		public static final double targetVelocityDefault = 1000;
 		public static final String setVelocityKey = "Set Velocity";
 		public static final String downHoodLimitKey = "Hood Down";
+		public static final String upHoodLimitKey = "Hood Up";
 		public static final String hoodMotorKey = "Hood Motor";
 		public static final String azimuthMotorKey = "Azimuth Motor";
 		public static final String leftAzimuthLimitKey = "Azimuth Left";
 		public static final String frontAzimuthLimitKey = "Azimuth Front";
 		public static final String rightAzimuthLimitKey = "Azimuth Right";
+		public static final String turretPositionKey = "Turret Pos";
 
 		public static final double shooterTargetVelocityDefault = 2500;
 		public static final String shooterTargetVelocityKey = "Shooter Vel";
@@ -183,6 +185,7 @@ public final class Constants
 		public static final int hoodMotorChannel = 20;
 		public static final int azimuthMotorChannel = 21;
 
+		public static final int upHoodLimitChannel = 8;
 		public static final int downHoodLimitChannel = 9;
 
 		public static final int leftAzimuthLimitChannel = 5; 
