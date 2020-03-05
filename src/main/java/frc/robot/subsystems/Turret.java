@@ -120,6 +120,7 @@ public class Turret extends SubsystemBase
 	public void periodic()
 	{
 		SmartDashboard.putBoolean(DashboardConstants.downHoodLimitKey, downHoodLimit.get());
+		SmartDashboard.putBoolean(DashboardConstants.upLimitKey, upHoodLimit.get());
 
 		SmartDashboard.putBoolean(DashboardConstants.leftAzimuthLimitKey, leftAzimuthLimit.get());
 		SmartDashboard.putBoolean(DashboardConstants.frontAzimuthLimitKey, frontAzimuthLimit.get());
