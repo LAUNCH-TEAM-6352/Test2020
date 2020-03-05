@@ -8,7 +8,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DashboardConstants;
+import frc.robot.Constants.HoodMotorConstants;
 import frc.robot.Constants.TurretConstants;
 
 /***
@@ -36,6 +37,7 @@ public class Turret extends SubsystemBase
 	private TalonSRX hoodMotor = new TalonSRX(TurretConstants.hoodMotorChannel);
 	private VictorSPX azimuthMotor = new VictorSPX(TurretConstants.azimuthMotorChannel);
 
+	private DigitalInput upHoodLimit = new DigitalInput(TurretConstants.upHoodLimitChannel);
 	private DigitalInput downHoodLimit = new DigitalInput(TurretConstants.downHoodLimitChannel);
 
 	private DigitalInput leftAzimuthLimit = new DigitalInput(TurretConstants.leftAzimuthLimitChannel);
@@ -54,11 +56,59 @@ public class Turret extends SubsystemBase
 	{
 		this.controller = controller;
 
+		hoodMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
+		hoodMotor.configAllowableClosedloopError(
+			HoodMotorConstants.profileSlot,
+			HoodMotorConstants.pidAllowableError,
+			HoodMotorConstants.pidTimeoutMs);
+		hoodMotor.configClosedLoopPeakOutput(
+			HoodMotorConstants.profileSlot,
+			HoodMotorConstants.pidPeakOutput,
+			HoodMotorConstants.pidTimeoutMs);
+		hoodMotor.configClosedLoopPeriod(
+			HoodMotorConstants.profileSlot,
+			HoodMotorConstants.pidLoopPeriodMs,
+			HoodMotorConstants.pidTimeoutMs);
+		hoodMotor.config_kP(
+			HoodMotorConstants.profileSlot,
+			HoodMotorConstants.pidP,
+			HoodMotorConstants.pidTimeoutMs);
+		hoodMotor.config_kI(
+			HoodMotorConstants.profileSlot,
+			HoodMotorConstants.pidI,
+			HoodMotorConstants.pidTimeoutMs);
+		hoodMotor.config_kD(
+			HoodMotorConstants.profileSlot,
+			HoodMotorConstants.pidD,
+			HoodMotorConstants.pidTimeoutMs);
+		hoodMotor.config_kF(
+			HoodMotorConstants.profileSlot,
+			HoodMotorConstants.pidFF,
+			HoodMotorConstants.pidTimeoutMs);
+		hoodMotor.config_IntegralZone(
+			HoodMotorConstants.profileSlot,
+			HoodMotorConstants.pidIZ,
+			HoodMotorConstants.pidTimeoutMs);
+		hoodMotor.selectProfileSlot(
+			HoodMotorConstants.profileSlot,
+			HoodMotorConstants.primaryClosedLoop);
+
+		hoodMotor.setSensorPhase(HoodMotorConstants.phase);
+
 		hoodMotor.setInverted(TurretConstants.isHoodMotorInverted);
 		azimuthMotor.setInverted(TurretConstants.isAzimuthMotorInverted);
 
 		// If the azimuth is at a limit switch, this will set its current position:
 		setCurrentAzimuthPosition();
+	}
+
+	/**
+	 * Moves the hood to the specifird position, in native units.
+	 * @param position
+	 */
+	public void setHoodPosition(double position)
+	{
+		hoodMotor.set(ControlMode.Position, position);
 	}
 
 	/**
@@ -68,14 +118,20 @@ public class Turret extends SubsystemBase
 	 */
 	public void setHood(double percentage)
 	{
-		if (percentage < 0 && !downHoodLimit.get())
+		if (percentage < 0 && !downHoodLimit.get() || percentage > 0 && !upHoodLimit.get())
 		{
 			percentage = 0;
-			controller.setRumble(RumbleType.kRightRumble, 1);
+			controller.setRumble(RumbleType.kLeftRumble, 1);
 		}
 		else
 		{
-			controller.setRumble(RumbleType.kRightRumble, 0);
+			controller.setRumble(RumbleType.kLeftRumble, 0);
+		}
+
+		// If the hood is all the way down, set its position to 0:
+		if (!downHoodLimit.get())
+		{
+			hoodMotor.setSelectedSensorPosition(0);
 		}
 
 		SmartDashboard.putNumber(DashboardConstants.hoodMotorKey, percentage);
@@ -135,6 +191,7 @@ public class Turret extends SubsystemBase
 		}
 
 		controller.setRumble(RumbleType.kRightRumble, isRumble ? 1 : 0);
+
 		SmartDashboard.putNumber(DashboardConstants.azimuthMotorKey, percentage);
 		azimuthMotor.set(ControlMode.PercentOutput, percentage * TurretConstants.azimuthPercentageScaleFactor);
 	}
@@ -162,8 +219,8 @@ public class Turret extends SubsystemBase
 		}
 		else
 		{
-			// We do not know where we are at, move left until we
-			// hit center or all the way left.
+			// We do not know where we are at, move right until we
+			// hit center or all the way right.
 			setAzimuth(TurretConstants.moveToRightAutoPercentage);
 		}
 	}
@@ -204,14 +261,27 @@ public class Turret extends SubsystemBase
 		return !centerAzimuthLimit.get();
 	}
 
+	public boolean isHoodAtDownPosition()
+	{
+		return !downHoodLimit.get();
+	}
+
+	public boolean isHoodAtUpPosition()
+	{
+		return !upHoodLimit.get();
+	}
+
 	@Override
 	public void periodic()
 	{
-		SmartDashboard.putBoolean(DashboardConstants.downHoodLimitKey, downHoodLimit.get());
-		SmartDashboard.putBoolean(DashboardConstants.upLimitKey, upHoodLimit.get());
+		SmartDashboard.putBoolean(DashboardConstants.downHoodLimitKey, !downHoodLimit.get());
+		SmartDashboard.putBoolean(DashboardConstants.upHoodLimitKey, !upHoodLimit.get());
 
-		SmartDashboard.putBoolean(DashboardConstants.leftAzimuthLimitKey, leftAzimuthLimit.get());
-		SmartDashboard.putBoolean(DashboardConstants.frontAzimuthLimitKey, centerAzimuthLimit.get());
-		SmartDashboard.putBoolean(DashboardConstants.rightAzimuthLimitKey, rightAzimuthLimit.get());
+		SmartDashboard.putBoolean(DashboardConstants.leftAzimuthLimitKey, !leftAzimuthLimit.get());
+		SmartDashboard.putBoolean(DashboardConstants.frontAzimuthLimitKey, !centerAzimuthLimit.get());
+		SmartDashboard.putBoolean(DashboardConstants.rightAzimuthLimitKey, !rightAzimuthLimit.get());
+
+		SmartDashboard.putString(DashboardConstants.turretPositionKey, currentAzimuthPosition.toString());
+		SmartDashboard.putNumber(DashboardConstants.hoodCurrentPositionKey, hoodMotor.getSelectedSensorPosition());
 	}
 }

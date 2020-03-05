@@ -72,16 +72,41 @@ public final class Constants
 		public static final double pidMinOutput = -1.0;
 		public static final double idMaxOutput = 1.0;
 
+		public static final int countsPerRevolution = 1024;
+		public static final int ticksPerCount = 4;
+		public static final int primaryClosedLoop = 0;
+
+		public static final boolean phase = false;
+	}
+
+	
+	public static final class HoodMotorConstants
+	{
+		public static final double peakVelocityUnitsPer100ms = 153000.0;
+
+		public static final int channel = 9;
+		public static final int profileSlot = 0;
+		public static final double pidP = 0.125;
+		public static final double pidI = 0.0;
+		public static final double pidD = 0.0;
+		public static final int pidIZ = 3000;
+		public static final double pidFF = 0.0;
+		public static final double pidPeakOutput = 1;
+		public static final int pidLoopPeriodMs = 1;
+		public static final double pidMaxIntegralAccum = 0;
+		public static final int pidAllowableError = 0;
+		public static final int pidTimeoutMs = 30;
+		public static final double pidMinOutput = -1.0;
+		public static final double idMaxOutput = 1.0;
 
 		public static final int countsPerRevolution = 1024;
 		public static final int ticksPerCount = 4;
 		public static final int primaryClosedLoop = 0;
 
-
-		public static final boolean phase = false;
+		public static final boolean phase = true;
 	}
 
-	public static final class Vex775proMotorConstants
+	public static final class ShooterMotorConstants
 	{
 		// This is the output of the 4:1 gearbox:
 		public static final double peakVelocityUnitsPer100ms = 20500.0;
@@ -119,14 +144,11 @@ public final class Constants
 
 	public static final class DashboardConstants
 	{
-		public static final String targetPercentageKey = "Target %";
-		public static final double targetPercentageDefault = 0.50;
-		public static final String targetVelocityKey = "Target Velocity";
-		public static final double targetVelocityDefault = 1000;
+		public static final int hoodTargetPositionDefault = 700000;
+
 		public static final String setVelocityKey = "Set Velocity";
 		public static final String downHoodLimitKey = "Hood Down";
 		public static final String upHoodLimitKey = "Hood Up";
-		public static final String hoodMotorKey = "Hood Motor";
 		public static final String azimuthMotorKey = "Azimuth Motor";
 		public static final String leftAzimuthLimitKey = "Azimuth Left";
 		public static final String frontAzimuthLimitKey = "Azimuth Front";
@@ -138,6 +160,11 @@ public final class Constants
 		public static final String shooterSetVelocityKey = "Shooter Vel Set";
 
 		public static final String shooterTargetPercentageKey = "Shooter %";
+
+		public static final String hoodTargetPositionKey = "Hood Target Pos";
+		public static final String hoodCurrentPositionKey = "Hood Current Pos";
+
+		public static final String hoodMotorKey = "Hood Motor";
 	}
 
 	public static final class LimelightConstants
@@ -193,14 +220,20 @@ public final class Constants
 		public static final int rightAzimuthLimitChannel = 7;
 		
 		public static final boolean isAzimuthMotorInverted = true;
-		public static final boolean isHoodMotorInverted = false;
+		public static final boolean isHoodMotorInverted = true;
 
-		public static final double hoodUpPercentageScaleFactor = 0.47;
-		public static final double hoodDownPercentageScaleFactor = 0.15;
+		public static final double hoodUpPercentageScaleFactor = 1.0;
+		public static final double hoodDownPercentageScaleFactor = 1.0;
 		public static final double azimuthPercentageScaleFactor = 1.00;
 
 		public static final double moveToLeftAutoPercentage = -1.0;
 		public final static double moveToRightAutoPercentage = +1.0;
+
+		public final static double moveHoodDownAutoPercentage = -1.0;
+		public final static double moveHoodUpAutoPercentage = +1.0;
+
+		public final static int hoodDownPosition = 0;
+		public final static int hoodupPosition = 1439854;
 	}
 
 	public static final class ShooterConstants

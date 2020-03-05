@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.Vex775proMotorConstants;
+import frc.robot.Constants.ShooterMotorConstants;
 
 public class Shooter extends SubsystemBase
 {
@@ -41,24 +41,24 @@ public class Shooter extends SubsystemBase
 		for (TalonSRX motor : new TalonSRX[] { masterMotor, slaveMotor})
 		{
 			motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
-			motor.configAllowableClosedloopError(Vex775proMotorConstants.profileSlot, Vex775proMotorConstants.pidAllowableError,
-					Vex775proMotorConstants.pidTimeoutMs);
-			motor.configClosedLoopPeakOutput(Vex775proMotorConstants.profileSlot, Vex775proMotorConstants.pidPeakOutput,
-					Vex775proMotorConstants.pidTimeoutMs);
-			motor.configClosedLoopPeriod(Vex775proMotorConstants.profileSlot, Vex775proMotorConstants.pidLoopPeriodMs,
-					Vex775proMotorConstants.pidTimeoutMs);
-			motor.config_kP(Vex775proMotorConstants.profileSlot, Vex775proMotorConstants.pidP,
-					Vex775proMotorConstants.pidTimeoutMs);
-			motor.config_kI(Vex775proMotorConstants.profileSlot, Vex775proMotorConstants.pidI,
-					Vex775proMotorConstants.pidTimeoutMs);
-			motor.config_kD(Vex775proMotorConstants.profileSlot, Vex775proMotorConstants.pidD,
-					Vex775proMotorConstants.pidTimeoutMs);
-			motor.config_kF(Vex775proMotorConstants.profileSlot, Vex775proMotorConstants.pidFF,
-					Vex775proMotorConstants.pidTimeoutMs);
-			motor.config_IntegralZone(Vex775proMotorConstants.profileSlot, Vex775proMotorConstants.pidIZ,
-					Vex775proMotorConstants.pidTimeoutMs);
-			motor.selectProfileSlot(Vex775proMotorConstants.profileSlot, Vex775proMotorConstants.primaryClosedLoop);
-			motor.setSensorPhase(Vex775proMotorConstants.phase);
+			motor.configAllowableClosedloopError(ShooterMotorConstants.profileSlot, ShooterMotorConstants.pidAllowableError,
+					ShooterMotorConstants.pidTimeoutMs);
+			motor.configClosedLoopPeakOutput(ShooterMotorConstants.profileSlot, ShooterMotorConstants.pidPeakOutput,
+					ShooterMotorConstants.pidTimeoutMs);
+			motor.configClosedLoopPeriod(ShooterMotorConstants.profileSlot, ShooterMotorConstants.pidLoopPeriodMs,
+					ShooterMotorConstants.pidTimeoutMs);
+			motor.config_kP(ShooterMotorConstants.profileSlot, ShooterMotorConstants.pidP,
+					ShooterMotorConstants.pidTimeoutMs);
+			motor.config_kI(ShooterMotorConstants.profileSlot, ShooterMotorConstants.pidI,
+					ShooterMotorConstants.pidTimeoutMs);
+			motor.config_kD(ShooterMotorConstants.profileSlot, ShooterMotorConstants.pidD,
+					ShooterMotorConstants.pidTimeoutMs);
+			motor.config_kF(ShooterMotorConstants.profileSlot, ShooterMotorConstants.pidFF,
+					ShooterMotorConstants.pidTimeoutMs);
+			motor.config_IntegralZone(ShooterMotorConstants.profileSlot, ShooterMotorConstants.pidIZ,
+					ShooterMotorConstants.pidTimeoutMs);
+			motor.selectProfileSlot(ShooterMotorConstants.profileSlot, ShooterMotorConstants.primaryClosedLoop);
+			motor.setSensorPhase(ShooterMotorConstants.phase);
 		}
 	}
 
@@ -70,7 +70,7 @@ public class Shooter extends SubsystemBase
 		// Velocity is measured in encoder units per 100 ms.
 
 		var unitsPer100Ms =
-			veolcity * Vex775proMotorConstants.countsPerRevolution * Vex775proMotorConstants.ticksPerCount
+			veolcity * ShooterMotorConstants.countsPerRevolution * ShooterMotorConstants.ticksPerCount
 			/ (60.0 * 1000.0 / 100.0);
 		SmartDashboard.putNumber(DashboardConstants.shooterSetVelocityKey, unitsPer100Ms);
 		masterMotor.set(ControlMode.Velocity, unitsPer100Ms);

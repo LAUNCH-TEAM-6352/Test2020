@@ -21,16 +21,13 @@ import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AimShooterUsingLimelight;
-import frc.robot.commands.RunMotorAtPercentage;
-import frc.robot.commands.RunMotorAtVelocity;
+import frc.robot.commands.MoveHoodToDownPosition;
+import frc.robot.commands.MoveHoodToUpPosition;
+import frc.robot.commands.MoveTurretToCenterPosition;
 import frc.robot.commands.RunTurretWithGameController;
 import frc.robot.commands.SetPipelineAndAimShooter;
-import frc.robot.subsystems.Falcon500MotorSubsystem;
-import frc.robot.subsystems.NeoMotorSubsystem;
-import frc.robot.subsystems.RedlineMotorSubsystem;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
-import frc.robot.subsystems.Vex775proMotorSubsystem;
 import frc.util.LimelightCamera;
 
 /**
@@ -43,10 +40,6 @@ import frc.util.LimelightCamera;
 public class RobotContainer
 {
 	// The robot's subsystems and commands are defined here...
-	private final NeoMotorSubsystem neoMotorSubsystem = null;
-	private final Falcon500MotorSubsystem falcon500MotorSubsystem = null;
-	private final RedlineMotorSubsystem redlineMotorSubsystem = null;
-	private final Vex775proMotorSubsystem vex775proMotorSubsystem = null;
 
 	private Shooter shooter = null;
 	private Turret turret = null;
@@ -74,34 +67,6 @@ public class RobotContainer
 		turret = new Turret(xboxController);
 
 		// Configure default commands:
-		if (neoMotorSubsystem != null)
-		{
-			neoMotorSubsystem.setDefaultCommand(
-				new RunMotorAtPercentage(neoMotorSubsystem, () -> xboxController.getY(Hand.kRight)));
-		}
-
-		if (falcon500MotorSubsystem != null)
-		{
-			falcon500MotorSubsystem.setDefaultCommand(
-				new RunMotorAtPercentage(falcon500MotorSubsystem, () -> xboxController.getY(Hand.kLeft)));
-		}
-
-		if (redlineMotorSubsystem != null)
-		{
-			redlineMotorSubsystem.setDefaultCommand(
-				new RunMotorAtPercentage(redlineMotorSubsystem, () ->
-					(xboxController.getTriggerAxis(Hand.kRight) - xboxController.getTriggerAxis(Hand.kLeft))
-			));
-		}
-
-		if (vex775proMotorSubsystem != null)
-		{
-			vex775proMotorSubsystem.setDefaultCommand(
-				new RunMotorAtPercentage(vex775proMotorSubsystem, () ->
-					(xboxController.getTriggerAxis(Hand.kRight) - xboxController.getTriggerAxis(Hand.kLeft))
-			));
-		}
-
 		if (turret != null)
 		{
 			turret.setDefaultCommand(new RunTurretWithGameController(turret, xboxController));
@@ -130,30 +95,26 @@ public class RobotContainer
 	 */
 	private void configureButtonBindings()
 	{
-		new JoystickButton(xboxController, Button.kB.value)
-			.whileHeld(new RunMotorAtVelocity(neoMotorSubsystem, DashboardConstants.targetVelocityKey));
-
-		new JoystickButton(xboxController, Button.kX.value)
-			.whileHeld(new RunMotorAtVelocity(falcon500MotorSubsystem, DashboardConstants.targetVelocityKey));
-
-		new JoystickButton(xboxController, Button.kY.value)
-			.whileHeld(new RunMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.targetVelocityKey));
-
 		if (turret != null)
 		{
-			new JoystickButton(xboxController, Button.kA.value)
+			new JoystickButton(xboxController, Button.kStart.value)
 				.whenPressed(new AimShooterUsingLimelight(turret));
+			
+			new JoystickButton(xboxController, Button.kStickRight.value)
+				.whenPressed(new MoveTurretToCenterPosition(turret));
+
+			new JoystickButton(xboxController, Button.kY.value)
+				.whenPressed(new MoveHoodToUpPosition(turret));
+
+			new JoystickButton(xboxController, Button.kA.value)
+				.whenPressed(new MoveHoodToDownPosition(turret));
 		}
 	}
 
 	private void initSmartDashboard()
 	{
-		SmartDashboard.putNumber(DashboardConstants.targetVelocityKey, DashboardConstants.targetVelocityDefault);
-		SmartDashboard.putNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault);
-
 		SmartDashboard.putNumber(DashboardConstants.shooterTargetVelocityKey, DashboardConstants.shooterTargetVelocityDefault);
-
-		SmartDashboard.putNumber(DashboardConstants.shooterTargetPercentageKey, 0);
+		SmartDashboard.putNumber(DashboardConstants.hoodTargetPositionKey, DashboardConstants.hoodTargetPositionDefault);
 
 		SmartDashboard.putData("LL: Driver1", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver1)));
 		SmartDashboard.putData("LL: Driver2", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver2)));
@@ -164,19 +125,15 @@ public class RobotContainer
 
 		if (turret != null)
 		{
-			SmartDashboard.putData("Run Hood at %", new RunCommand(
-				() -> turret.setHood(SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault)),
-				//() -> shooter.setAltitude(0),
-				turret)
-			);
-
-			SmartDashboard.putData("Run Azm at %", new RunCommand(
-				() -> turret.setAzimuth(SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, DashboardConstants.targetPercentageDefault)),
-				//() -> shooter.setAzimuth(0),
-				turret)
-			);
-
 			SmartDashboard.putData("Target Shooter", new SetPipelineAndAimShooter(turret));
+
+			SmartDashboard.putData("Move Hood", new StartEndCommand(
+				() -> turret.setHoodPosition(
+					SmartDashboard.getNumber(DashboardConstants.hoodTargetPositionKey, 0)),
+				() -> turret.setHood(0),
+				turret
+				)
+			);
 		}
 
 		if (shooter != null)
@@ -197,19 +154,6 @@ public class RobotContainer
 				)
 			);
 		}
-
-		if (redlineMotorSubsystem != null)
-		{
-			SmartDashboard.putData("Run Redline at Veolcity", new RunMotorAtVelocity(redlineMotorSubsystem, DashboardConstants.targetVelocityKey));
-			SmartDashboard.putData("Run Redline at Percentage", new RunMotorAtPercentage(redlineMotorSubsystem, () -> SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, 0.0)));
-		}
-
-		if (vex775proMotorSubsystem != null)
-		{
-			SmartDashboard.putData("Run 775pro at Veolcity", new RunMotorAtVelocity(vex775proMotorSubsystem, DashboardConstants.targetVelocityKey));
-			SmartDashboard.putData("Run 775pro at Percentage", new RunMotorAtPercentage(vex775proMotorSubsystem, () -> SmartDashboard.getNumber(DashboardConstants.targetPercentageKey, 0.0)));
-		}
-
 	}
 
 	/**

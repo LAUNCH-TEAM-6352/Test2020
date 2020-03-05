@@ -7,31 +7,27 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.MotorSubsystemBase;
-
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.TurretConstants;
+import frc.robot.subsystems.Turret;
 
 /**
- * An example command that uses an example subsystem.
+ * Moves the hood to the up position.
  */
-public class RunMotorAtPercentage extends CommandBase
+public class MoveHoodToUpPosition extends CommandBase
 {
 	@SuppressWarnings(
 	{ "PMD.UnusedPrivateField", "PMD.SingularField" })
-	private final MotorSubsystemBase subsystem;
-	private final DoubleSupplier doubleSupplier;
+	private final Turret turret;
 
-	public RunMotorAtPercentage(MotorSubsystemBase subsystem, DoubleSupplier doubleSupplier)
+	public MoveHoodToUpPosition(Turret turret)
 	{
-		this.subsystem = subsystem;
-		this.doubleSupplier = doubleSupplier;
+		this.turret = turret;
 
 		// Use addRequirements() here to declare subsystem dependencies.
-		if (subsystem != null)
+		if (turret != null)
 		{
-			addRequirements(subsystem);
+			addRequirements(turret);
 		}
 	}
 
@@ -45,23 +41,20 @@ public class RunMotorAtPercentage extends CommandBase
 	@Override
 	public void execute()
 	{
-		if (subsystem != null)
-		{
-			subsystem.setPercentage(doubleSupplier.getAsDouble());
-		}
+		turret.setHood(TurretConstants.moveHoodUpAutoPercentage);
 	}
 
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted)
 	{
-		subsystem.stop();
+		turret.setHood(0);
 	}
 
 	// Returns true when the command should end.
 	@Override
 	public boolean isFinished()
 	{
-		return false;
+		return turret.isHoodAtUpPosition();
 	}
 }
