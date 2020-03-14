@@ -53,6 +53,30 @@ public final class Constants
 		public static final int primaryClosedLoop = 0;
 	}
 
+	public static final class JohnsonMotorConstants
+	{
+		public static final int channel = 9;
+		public static final int profileSlot = 0;
+		public static final double pidP = 0.0499999523;
+		public static final double pidI = 9.98973846E-05;
+		public static final double pidD = 0.0;
+		public static final int pidIZ = 300;
+		public static final double pidFF = 1023.0 / 7200.0;
+		public static final double pidPeakOutput = 1;
+		public static final int pidLoopPeriodMs = 1;
+		public static final double pidMaxIntegralAccum = 0;
+		public static final int pidAllowableError = 0;
+		public static final int pidTimeoutMs = 30;
+		public static final double pidMinOutput = -1.0;
+		public static final double idMaxOutput = 1.0;
+
+		public static final int countsPerRevolution = 2048;
+		public static final int primaryClosedLoop = 0;
+		
+		public static final boolean phase = false;
+		public static final boolean isInverted = false;
+	}
+
 	public static final class RedlineMotorConstants
 	{
 		public static final double peakVelocityUnitsPer100ms = 153000.0;

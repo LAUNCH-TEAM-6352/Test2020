@@ -26,6 +26,7 @@ import frc.robot.commands.MoveHoodToUpPosition;
 import frc.robot.commands.MoveTurretToCenterPosition;
 import frc.robot.commands.RunTurretWithGameController;
 import frc.robot.commands.SetPipelineAndAimShooter;
+import frc.robot.subsystems.JohnsonMotor;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
 import frc.util.LimelightCamera;
@@ -43,6 +44,7 @@ public class RobotContainer
 
 	private Shooter shooter = null;
 	private Turret turret = null;
+	private JohnsonMotor johnsonMotor;
 
 	// I/O Devices:
 	private XboxController xboxController = null;
@@ -63,8 +65,9 @@ public class RobotContainer
 		//redlineMotorSubsystem = new RedlineMotorSubsystem();
 		//vex775proMotorSubsystem = new Vex775proMotorSubsystem();
 
-		shooter = new Shooter(xboxController);
-		turret = new Turret(xboxController);
+		//shooter = new Shooter(xboxController);
+		//turret = new Turret(xboxController);
+		johnsonMotor = new JohnsonMotor(xboxController);
 
 		// Configure default commands:
 		if (turret != null)
@@ -77,6 +80,14 @@ public class RobotContainer
 			shooter.setDefaultCommand(new RunCommand(
 				() -> shooter.setPercentage(xboxController.getTriggerAxis(Hand.kLeft)),
 				shooter
+			));
+		}
+
+		if (johnsonMotor != null)
+		{
+			johnsonMotor.setDefaultCommand(new RunCommand(
+				() -> johnsonMotor.setPercentage(xboxController.getTriggerAxis(Hand.kLeft) - xboxController.getTriggerAxis(Hand.kRight)),
+				johnsonMotor
 			));
 		}
 

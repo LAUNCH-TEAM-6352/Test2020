@@ -9,7 +9,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,15 +23,11 @@ public class Shooter extends SubsystemBase
 	private TalonSRX masterMotor = new TalonSRX(ShooterConstants.leftMotorChannel);
 	private TalonSRX slaveMotor = new TalonSRX(ShooterConstants.rightMotorChannel);
 
-	private XboxController controller;
-
 	/**
 	 * Creates an instance.
 	 */
 	public Shooter(XboxController controller)
 	{
-		this.controller = controller;
-
 		masterMotor.setInverted(ShooterConstants.isLeftMotorInverted);
 		slaveMotor.setInverted(ShooterConstants.isRightMotorInverted);
 
