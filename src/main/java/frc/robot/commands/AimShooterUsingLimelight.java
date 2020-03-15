@@ -60,7 +60,6 @@ public class AimShooterUsingLimelight extends CommandBase
 	{
 		double azimuthValue = getAzimuthValue(limelight.getTargetXPosition());
 		SmartDashboard.putNumber(DashboardConstants.azimuthMotorKey, azimuthValue);
-		SmartDashboard.putNumber("Azimuth %", azimuthValue);
 	}
 
 	// Called once the command ends or is interrupted.

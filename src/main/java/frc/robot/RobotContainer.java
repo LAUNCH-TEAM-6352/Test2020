@@ -130,7 +130,6 @@ public class RobotContainer
 	private void initSmartDashboard()
 	{
 		SmartDashboard.putNumber(DashboardConstants.johnsonTargetVelocityKey, DashboardConstants.johnsonTargetVelocityDefault);
-		SmartDashboard.putNumber(DashboardConstants.hoodTargetPositionKey, DashboardConstants.hoodTargetPositionDefault);
 
 		SmartDashboard.putData("LL: Driver1", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver1)));
 		SmartDashboard.putData("LL: Driver2", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver2)));
