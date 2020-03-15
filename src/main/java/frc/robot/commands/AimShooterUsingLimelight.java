@@ -10,21 +10,12 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DashboardConstants;
-import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.TargetingConstants;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Turret;
 import frc.util.LimelightCamera;
 
 public class AimShooterUsingLimelight extends CommandBase
 {
-	private Turret turret;
 	private LimelightCamera limelight;
-
-	private double altitudeSlope;
-	private double altitudeYIntercept;
-	private double altitudeMaxSpeedAbs;
-	private double altitudeMinSpeedAbs;
 
 	private double azimuthSlope;
 	private double azimuthYIntercept;
@@ -34,10 +25,8 @@ public class AimShooterUsingLimelight extends CommandBase
 	/**
 	 * Creates a new AimShooterUsingLimelight.
 	 */
-	public AimShooterUsingLimelight(Turret turret)
+	public AimShooterUsingLimelight()
 	{
-		this.turret = turret;
-		addRequirements(turret);
 		limelight = LimelightCamera.getInstance();
 	}
 
@@ -55,16 +44,7 @@ public class AimShooterUsingLimelight extends CommandBase
 			return;
 		}
 
-		double sign = Math.signum(limelight.getTargetYPosition());
-		int index = sign < 0 ? 0 : 1;
-		altitudeSlope =
-			(TargetingConstants.minAltitudeSpeeds[index] - TargetingConstants.maxAltitudeSpeeds[index]) /
-			(TargetingConstants.minAltitudeDeltas[index] - TargetingConstants.maxAltitudeDeltas[index]);
-		altitudeYIntercept = TargetingConstants.maxAltitudeSpeeds[index] - (altitudeSlope * TargetingConstants.maxAltitudeDeltas[index]);
-		altitudeMaxSpeedAbs = Math.abs(TargetingConstants.maxAltitudeSpeeds[index]);
-		altitudeMinSpeedAbs = Math.abs(TargetingConstants.minAltitudeSpeeds[index]);
-
-		sign = Math.signum(limelight.getTargetXPosition());
+		double sign = Math.signum(limelight.getTargetXPosition());
 		azimuthSlope =
 			(TargetingConstants.minAzimuthSpeed * sign - TargetingConstants.maxAzimuthSpeed * sign) /
 			(TargetingConstants.minAzimuthDelta * sign - TargetingConstants.maxAzimuthDelta * sign);
@@ -78,20 +58,16 @@ public class AimShooterUsingLimelight extends CommandBase
 	@Override
 	public void execute()
 	{
-		double altitudeValue = getAltitudeValue(limelight.getTargetYPosition());
-		SmartDashboard.putNumber(DashboardConstants.hoodMotorKey, altitudeValue);
-		//turret.setAltitude(altitudeValue);
-
 		double azimuthValue = getAzimuthValue(limelight.getTargetXPosition());
 		SmartDashboard.putNumber(DashboardConstants.azimuthMotorKey, azimuthValue);
-		//turret.setAzimuth(azimuthValue);
+		SmartDashboard.putNumber("Azimuth %", azimuthValue);
 	}
 
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted)
 	{
-		//turret.stop();
+		SmartDashboard.putNumber("Azimuth %", 0);
 	}
 
 	// Returns true when the command should end.
@@ -99,25 +75,7 @@ public class AimShooterUsingLimelight extends CommandBase
 	public boolean isFinished()
 	{
 		return !limelight.isTargetAcquired() ||
-			(Math.abs(limelight.getTargetXPosition()) < TargetingConstants.azimuthTolerance &&
-			 Math.abs(limelight.getTargetYPosition()) < TargetingConstants.altitudeTolerance);
-	}
-
-	private double getAltitudeValue(double input)
-	{
-		double output = input * altitudeSlope + altitudeYIntercept;
-		double sign = Math.signum(output);
-
-		if (Math.abs(output) > altitudeMaxSpeedAbs)
-		{
-			output = altitudeMaxSpeedAbs * sign;
-		}
-		else if (Math.abs(output) < altitudeMinSpeedAbs)
-		{
-			output = 0;
-		}
-
-		return output;
+			Math.abs(limelight.getTargetXPosition()) < TargetingConstants.azimuthTolerance;
 	}
 
 	private double getAzimuthValue(double input)

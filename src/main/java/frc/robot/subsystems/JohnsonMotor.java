@@ -12,7 +12,9 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.JohnsonMotorConstants;
 
 /**
@@ -22,12 +24,8 @@ public class JohnsonMotor extends SubsystemBase
 {
 	private TalonSRX motor = new TalonSRX(JohnsonMotorConstants.channel);
 
-	private XboxController controller;
-
-	public JohnsonMotor(XboxController controller)
+	public JohnsonMotor()
 	{
-		this.controller = controller;
-
 		motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
 		motor.configAllowableClosedloopError(
 			JohnsonMotorConstants.profileSlot,
@@ -77,6 +75,20 @@ public class JohnsonMotor extends SubsystemBase
 	public void setPercentage(double value)
 	{
 		motor.set(ControlMode.PercentOutput, value);
+	}
+
+	/***
+	 * Sets the shooter motor speeds in velocity (RPM).
+	 * 600.0 is 
+	 */
+	public void setVelocity(double veolcity)
+	{
+		// Velocity is measured in encoder units per 100 ms.
+		// 600.0 is the number of 100ms per minute.
+		var unitsPer100Ms =
+			veolcity * JohnsonMotorConstants.countsPerRevolution * JohnsonMotorConstants.unitsPerCount / 600.0;
+		SmartDashboard.putNumber(DashboardConstants.johnsonSetVelocityKey, unitsPer100Ms);
+		motor.set(ControlMode.Velocity, unitsPer100Ms);
 	}
 
 	public void stop()

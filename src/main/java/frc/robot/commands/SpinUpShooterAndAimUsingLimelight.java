@@ -9,36 +9,38 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.LimelightConstants;
-import frc.robot.subsystems.Turret;
+import frc.robot.subsystems.JohnsonMotor;
 import frc.util.LimelightCamera;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
-public class SetPipelineAndAimShooter extends SequentialCommandGroup {
-  /**
-   * Creates a new SetPipelineAndAimShooter.
-   */
-  public SetPipelineAndAimShooter(Turret turret) {
-    // Add your commands in the super() call, e.g.
-    // super(new FooCommand(), new BarCommand());
-    super(
-		new ConditionalCommand(
+public class SpinUpShooterAndAimUsingLimelight extends ParallelCommandGroup {
+	/**
+	 * Creates a new StartShooterAndAimUsingLimelight.
+	 */
+	public SpinUpShooterAndAimUsingLimelight(JohnsonMotor johnsonMotor)
+	{
+		super(
+			new RunJohnsonMotor(johnsonMotor, DashboardConstants.johnsonTargetVelocityKey),
 			new SequentialCommandGroup(
-				new InstantCommand(() ->
-				{
-					LimelightCamera.getInstance().setPipeline(LimelightConstants.targetingPipelines[LimelightCamera.getInstance().getPipeline()]);
-				}),
-				new WaitCommand(2.0)
-			),
-			new WaitCommand(0),
-			() -> LimelightConstants.targetingPipelines[LimelightCamera.getInstance().getPipeline()] >= 0
-		),
-		new AimShooterUsingLimelight(turret)	
-
-	);
-  }
+				new ConditionalCommand(
+					new SequentialCommandGroup(
+						new InstantCommand(() ->
+							LimelightCamera.getInstance().setPipeline(LimelightConstants.targetingPipelines[LimelightCamera.getInstance().getPipeline()])
+						),
+						new WaitCommand(1.0)
+					),
+					new WaitCommand(0),
+					() -> LimelightConstants.targetingPipelines[LimelightCamera.getInstance().getPipeline()] >= 0
+				),
+				new AimShooterUsingLimelight()
+			)
+		);
+	}
 }

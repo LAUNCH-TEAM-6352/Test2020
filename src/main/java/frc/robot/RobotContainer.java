@@ -13,19 +13,22 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DashboardConstants;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AimShooterUsingLimelight;
-import frc.robot.commands.MoveHoodToDownPosition;
-import frc.robot.commands.MoveHoodToUpPosition;
-import frc.robot.commands.MoveTurretToCenterPosition;
+import frc.robot.commands.RunJohnsonMotor;
 import frc.robot.commands.RunTurretWithGameController;
-import frc.robot.commands.SetPipelineAndAimShooter;
+import frc.robot.commands.SpinDownShooter;
+import frc.robot.commands.SpinUpShooterAndAimUsingLimelight;
 import frc.robot.subsystems.JohnsonMotor;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
@@ -47,7 +50,7 @@ public class RobotContainer
 	private JohnsonMotor johnsonMotor;
 
 	// I/O Devices:
-	private XboxController xboxController = null;
+	private XboxController gameController = null;
 	private LimelightCamera limelightCamera = null;
 
 	/**
@@ -56,7 +59,7 @@ public class RobotContainer
 	public RobotContainer()
 	{
 		// Create I/O Devices:
-		xboxController = new XboxController(OIConstants.xboxControllerPort);
+		gameController = new XboxController(OIConstants.xboxControllerPort);
 		limelightCamera = LimelightCamera.getInstance();
 
 		// Create desired subsystems:
@@ -67,18 +70,18 @@ public class RobotContainer
 
 		//shooter = new Shooter(xboxController);
 		//turret = new Turret(xboxController);
-		johnsonMotor = new JohnsonMotor(xboxController);
+		johnsonMotor = new JohnsonMotor();
 
 		// Configure default commands:
 		if (turret != null)
 		{
-			turret.setDefaultCommand(new RunTurretWithGameController(turret, xboxController));
+			turret.setDefaultCommand(new RunTurretWithGameController(turret, gameController));
 		}
 
 		if (shooter != null)
 		{
 			shooter.setDefaultCommand(new RunCommand(
-				() -> shooter.setPercentage(xboxController.getTriggerAxis(Hand.kLeft)),
+				() -> shooter.setPercentage(gameController.getTriggerAxis(Hand.kLeft)),
 				shooter
 			));
 		}
@@ -86,7 +89,7 @@ public class RobotContainer
 		if (johnsonMotor != null)
 		{
 			johnsonMotor.setDefaultCommand(new RunCommand(
-				() -> johnsonMotor.setPercentage(xboxController.getTriggerAxis(Hand.kLeft) - xboxController.getTriggerAxis(Hand.kRight)),
+				() -> johnsonMotor.setPercentage(gameController.getTriggerAxis(Hand.kLeft) - gameController.getTriggerAxis(Hand.kRight)),
 				johnsonMotor
 			));
 		}
@@ -106,25 +109,27 @@ public class RobotContainer
 	 */
 	private void configureButtonBindings()
 	{
-		if (turret != null)
-		{
-			new JoystickButton(xboxController, Button.kStart.value)
-				.whenPressed(new AimShooterUsingLimelight(turret));
-			
-			new JoystickButton(xboxController, Button.kStickRight.value)
-				.whenPressed(new MoveTurretToCenterPosition(turret));
+		// Start shooter motors, switch to vision procesing, aim turret
+		new JoystickButton(gameController, Button.kA.value)
+			.whenPressed(new SpinUpShooterAndAimUsingLimelight(johnsonMotor));
 
-			new JoystickButton(xboxController, Button.kY.value)
-				.whenPressed(new MoveHoodToUpPosition(turret));
+		// Stop the shooter motors and restore the Limelight to driver mode:
+		new JoystickButton(gameController, Button.kY.value)
+			.whenPressed(new SpinDownShooter(johnsonMotor));
 
-			new JoystickButton(xboxController, Button.kA.value)
-				.whenPressed(new MoveHoodToDownPosition(turret));
-		}
+		// Set the limelight to 1x driver mode:
+		new JoystickButton(gameController, Button.kBumperLeft.value)
+			.whenPressed(new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver1)));
+
+		// Set the limelight to 2x driver mode:
+		new JoystickButton(gameController, Button.kBumperRight.value)
+			.whenPressed(new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver2)));
+
 	}
 
 	private void initSmartDashboard()
 	{
-		SmartDashboard.putNumber(DashboardConstants.shooterTargetVelocityKey, DashboardConstants.shooterTargetVelocityDefault);
+		SmartDashboard.putNumber(DashboardConstants.johnsonTargetVelocityKey, DashboardConstants.johnsonTargetVelocityDefault);
 		SmartDashboard.putNumber(DashboardConstants.hoodTargetPositionKey, DashboardConstants.hoodTargetPositionDefault);
 
 		SmartDashboard.putData("LL: Driver1", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineDriver1)));
@@ -134,9 +139,22 @@ public class RobotContainer
 		SmartDashboard.putData("LL: Vision2", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineVision2)));
 		SmartDashboard.putData("LL: Vision3", new InstantCommand(() -> limelightCamera.setPipeline(LimelightConstants.pipelineVision3)));
 
+		if (johnsonMotor != null)
+		{
+			SmartDashboard.putData("Run Johnson Vel", new StartEndCommand(
+				() -> johnsonMotor.setVelocity(
+					SmartDashboard.getNumber(DashboardConstants.johnsonTargetVelocityKey, 0)),
+				() -> johnsonMotor.setPercentage(0),
+				johnsonMotor
+				)
+			);
+
+			SmartDashboard.putData("Spin Up Shooter & Aim", new SpinUpShooterAndAimUsingLimelight(johnsonMotor));
+			SmartDashboard.putData("Spin Down Shooter", new SpinDownShooter(johnsonMotor));
+		}
+
 		if (turret != null)
 		{
-			SmartDashboard.putData("Target Shooter", new SetPipelineAndAimShooter(turret));
 
 			SmartDashboard.putData("Move Hood", new StartEndCommand(
 				() -> turret.setHoodPosition(

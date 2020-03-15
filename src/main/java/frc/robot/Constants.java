@@ -55,13 +55,15 @@ public final class Constants
 
 	public static final class JohnsonMotorConstants
 	{
+		public static final double peakVelocityUnitsPer100ms = 134.0;
+
 		public static final int channel = 9;
 		public static final int profileSlot = 0;
-		public static final double pidP = 0.0499999523;
-		public static final double pidI = 9.98973846E-05;
+		public static final double pidP = 0.01;
+		public static final double pidI = 0.0001;
 		public static final double pidD = 0.0;
 		public static final int pidIZ = 300;
-		public static final double pidFF = 1023.0 / 7200.0;
+		public static final double pidFF = 1023.0 / peakVelocityUnitsPer100ms;
 		public static final double pidPeakOutput = 1;
 		public static final int pidLoopPeriodMs = 1;
 		public static final double pidMaxIntegralAccum = 0;
@@ -70,7 +72,8 @@ public final class Constants
 		public static final double pidMinOutput = -1.0;
 		public static final double idMaxOutput = 1.0;
 
-		public static final int countsPerRevolution = 2048;
+		public static final double countsPerRevolution = 44.4;
+		public static final int unitsPerCount = 4;
 		public static final int primaryClosedLoop = 0;
 		
 		public static final boolean phase = false;
@@ -189,6 +192,15 @@ public final class Constants
 		public static final String hoodCurrentPositionKey = "Hood Current Pos";
 
 		public static final String hoodMotorKey = "Hood Motor";
+
+		public static final double johnsonTargetVelocityDefault = 200;
+		public static final String johnsonTargetVelocityKey = "Johnson Vel";
+		public static final String johnsonSetVelocityKey = "Johnson Vel Set";
+
+		public static final String limelightTaKey = "Limelight ta";
+		public static final String limelightTxKey = "Limelight tx";
+		public static final String limelightTyKey = "Limelight ty";
+		public static final String limelightTvKey = "Limelight tv";
 	}
 
 	public static final class LimelightConstants
@@ -207,10 +219,10 @@ public final class Constants
 		public static final int ledModeOn = 3;
 
 		public static final int pipelineDriver1 = 0;
-		public static final int pipelineDriver2 = 1;
-		public static final int pipelineDriver3 = 2;
-		public static final int pipelineVision1 = 3;
-		public static final int pipelineVision2 = 4;
+		public static final int pipelineVision1 = 1;
+		public static final int pipelineDriver2 = 2;
+		public static final int pipelineVision2 = 3;
+		public static final int pipelineDriver3 = 4;
 		public static final int pipelineVision3 = 5;
 		public static final int pipelineDefault = pipelineDriver1;
 
@@ -219,15 +231,31 @@ public final class Constants
 		public static final int[] targetingPipelines =
 		{
 			pipelineVision1,
+			-1,
 			pipelineVision2,
+			-1,
 			pipelineVision3,
-			-1,
-			-1,
 			-1,
 			pipelineVision1,
 			pipelineVision1,
 			pipelineVision1,
 			pipelineVision1
+		};
+
+		// The desired driving pipeline for each
+		// pipeline. -1 represents no change.
+		public static final int[] drivingPipelines =
+		{
+			-1,
+			pipelineDriver1,
+			-1,
+			pipelineDriver2,
+			-1,
+			pipelineDriver3,
+			pipelineDriver1,
+			pipelineDriver1,
+			pipelineDriver1,
+			pipelineDriver1
 		};
 	}
 
